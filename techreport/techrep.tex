@@ -1,0 +1,220 @@
+\documentclass{article}
+\usepackage{fullpage}
+%\linespread{1.25}
+%\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{hyperref}
+%\usepackage[round]{natbib}
+%\renewcommand{\familydefault}{\sfdefault}
+%\setlength{\parindent}{0pt}
+%\setlength{\parskip}{10pt plus4pt minus4pt}
+
+\begin{document}
+
+\title{Derivatives of the Multivariate Gaussian Distribution}
+\author{}
+\maketitle
+
+\section{Full Parameterization}
+
+The likelihood $L$ of the multivariate Gaussian or normal distribution~(MVN) with $k$ dimensions for a single $k$ dimensional observation $y = (y_1, y_2, \dots, y_k)^\top$ is expressed by
+%
+\begin{equation}
+ L(y|\mu, \Sigma) = (2\pi)^{-\frac{k}{2}} |\Sigma|^{-\frac{1}{2}} \exp \left(-\frac{1}{2} (y-\mu)^\top \Sigma^{-1} (y-\mu) \right),
+\end{equation}
+%
+where $\mu = (\mu_1, \mu_2, \dots, \mu_k)^\top$ denotes the vector of the mean parameters and $\Sigma$ denotes the covariance matrix. Thus the log-likelihood $l=\log(L)$ is
+%
+\begin{equation}
+ l(\mu, \Sigma|y) = -\frac{k}{2}\log(2\pi) - \frac{1}{2}\log(|\Sigma|) - \frac{1}{2} (y-\mu)^\top \Sigma^{-1} (y-\mu).
+ \label{eq:ll1}
+\end{equation}
+%
+$\Sigma$ can be decomposed into
+%
+\begin{equation}
+ \Sigma = D \Omega D, \qquad \text{thus} \qquad \Sigma^{-1} = D^{-1} \Omega^{-1} D^{-1}, \qquad \text{and} \qquad |\Sigma|=|D| |\Omega| |D|
+\end{equation}
+%
+with
+%
+\begin{equation}
+ D=
+  \begin{pmatrix}
+   \sigma_1 & 0 & \cdots & 0 \\
+   0 & \sigma_2 & \cdots & 0 \\
+   \vdots  & \vdots  & \ddots & \vdots  \\
+   0 & 0 & \cdots & \sigma_k
+  \end{pmatrix},
+  \qquad \text{and} \qquad
+ \Omega=
+  \begin{pmatrix}
+   1 & \rho_{12} & \cdots & \rho_{1k} \\
+   \rho_{12} & 1 & \cdots & \rho_{2k} \\
+   \vdots & \vdots & \ddots & \vdots \\
+   \rho_{1k} & \rho_{2k} & \cdots & 1
+  \end{pmatrix},
+  \label{eq:mat}
+\end{equation}
+%
+where $\sigma_i$ and $\rho_{ij}$ denote the standard deviation and the correlation, respectively. Thus, the log-likelihood can be rewritten as,
+%
+\begin{equation}
+ l(\mu, D, \Omega|y) = -\frac{k}{2}\log(2\pi) - \log(|D|) - \frac{1}{2}\log(|\Omega|) - \frac{1}{2} (y-\mu)^\top D^{-1} \Omega^{-1} D^{-1} (y-\mu).
+\end{equation}
+%
+$|D| = \prod_{i=1}^{k} \sigma_i$ and scaling $\tilde{y_i} = (y_i - \mu_i) / \sigma_i$ yields
+%
+\begin{equation}
+ l = -\frac{k}{2}\log(2\pi) - \sum_{i=1}^{k} \log(\sigma_i) - \frac{1}{2}\log(|\Omega|) - \frac{1}{2} \tilde{y}^\top \Omega^{-1} \tilde{y}.
+ \label{eq:ll2}
+\end{equation}
+%
+In the following the elements of $\Sigma^{-1}$ and $\Omega^{-1}$ will be denoted by $\varsigma_{ij}$ and $\omega_{ij}$, respectively.
+
+Deriving Eq.~\ref{eq:ll1} (using formula 86 in the
+%\href{http://www2.imm.dtu.dk/pubdb/views/edoc_download.php/3274/pdf/imm3274.pdf}
+{matrix cookbook}) yields
+%
+\begin{equation}
+ \frac{\partial l}{\partial \mu} = \Sigma^{-1} (y-\mu), \qquad \text{or} \qquad
+ \frac{\partial l}{\partial \mu_i} = \sum_{j=1}^{k} \varsigma_{ij} (y_j - \mu_j).
+ \label{eq:mu}
+\end{equation}
+%
+As
+%
+\begin{equation}
+ \frac{\partial}{\partial \tilde{y}} \tilde{y}^\top \Omega^{-1} \tilde{y} = 2\Omega^{-1}\tilde{y}, \qquad \text{and thus} \qquad
+ \frac{\partial}{\partial \tilde{y}_i} \tilde{y}^\top \Omega^{-1} \tilde{y} = 2\sum_{j=1}^{k} \omega_{ij} \tilde{y}_j,
+\end{equation}
+%
+and
+%
+\begin{equation}
+ \frac{\partial \tilde{y}_i}{\partial \sigma_i} = - \frac{1}{\sigma_i} \tilde{y}_i, \qquad \text \qquad
+ \frac{\partial l}{\partial \sigma_i} = \frac{\partial l}{\partial \tilde{y}_i} \frac{\partial \tilde{y}_i}{\partial \sigma_i}
+\end{equation}
+%
+\
+deriving Eq.~\ref{eq:ll2} with respect to $\sigma_i$ yields
+%
+\begin{equation}
+ \frac{\partial l}{\partial \sigma_i} = -\frac{1}{\sigma_i} + \frac{1}{\sigma_i} \tilde{y}_i \sum_{j=1}^{k} \omega_{ij} \tilde{y}_j.
+ \label{eq:sig}
+\end{equation}
+%
+Applying formula 57 and 61 from the matrix cookbook yields
+%
+\begin{equation}
+ \frac{\partial l}{\partial \Omega} = -\frac{1}{2} \Omega^{-1} + \frac{1}{2} \Omega^{-1} \tilde{y} \tilde{y}^\top \Omega^{-1},
+\end{equation}
+%
+or
+%
+\begin{equation}
+ \frac{\partial l}{\partial \rho_{ij}} = -\frac{1}{2} \omega_{ij} + \frac{1}{2} \left( \sum_{m=1}^{k} \omega_{im}\tilde{y}_m \right) \left( \sum_{m=1}^{k} \omega_{jm}\tilde{y}_m \right).
+ \label{eq:rho}
+\end{equation}
+%
+Finally, Eq.~\ref{eq:mu}, \ref{eq:sig} and \ref{eq:rho} contain all derivatives.
+
+In the following we skip the indices. Now link functions between $\sigma$ (log) and $\rho$ (rhogit) and its predictors $\eta_{\sigma}$ and $\eta_{\rho}$ are introduced by
+%
+\begin{equation}
+ \log(\sigma) = \eta_{\sigma}, \qquad \sigma = \exp( \eta_{\sigma} ),
+\end{equation}
+%
+and
+%
+\begin{equation}
+ \frac{\rho}{\sqrt{1-\rho^2}} = \eta_{\rho}, \qquad \rho = \frac{\eta}{\sqrt{1+\eta_{\rho}^2}},
+\end{equation} 
+%
+respectively. With its derivatives
+%
+\begin{equation}
+ \frac{\partial \sigma}{\partial \eta_{\sigma}} = \exp(\eta_{\sigma}) = \sigma,
+\end{equation}
+%
+and
+%
+\begin{equation}
+ \frac{\partial \rho}{\partial \eta_{\rho}} = \frac{1}{(1+\eta_{\rho}^2)^\frac{3}{2}}.
+\end{equation}
+%
+
+\newpage
+\section{The AR(1)-Process Parameterization}
+
+We assume that the response variables $y_1, y_2, \dots, y_k$ are samples from an order~1 autoregressive process. Thus, $\Omega$ in Eq.~\ref{eq:mat} can be re-written as,
+%
+\begin{equation}
+ \Omega=
+  \begin{pmatrix}
+   1 & \rho & \rho^2 & \cdots & \rho^{k-1} \\
+   \rho & 1 & \rho & \cdots & \rho^{k-2} \\
+   \rho^2 & \rho & 1 & \cdots & \rho^{k-3} \\
+   \vdots & \vdots & \vdots & \ddots & \vdots \\
+   \rho^{k-1} & \rho^{k-2} & \rho^{k-3} & \cdots & 1
+  \end{pmatrix},
+\end{equation}
+%
+with
+\begin{equation}
+ \Omega^{-1}= \frac{1}{1-\rho^2}
+  \begin{pmatrix}
+   1 & -\rho & 0 & \cdots & 0 \\
+   -\rho & 1+\rho^2 & -\rho & \cdots & 0 \\
+   0 & -\rho & 1+\rho^2 & \cdots & 0 \\
+   \vdots & \vdots & \vdots & \ddots & \vdots \\
+   0 & 0 & 0 & \cdots & 1
+  \end{pmatrix},
+\end{equation}
+%
+Now,
+\begin{equation}
+  |\Omega| = (1-\rho^2)^{k-1}
+  \qquad \text{and} \qquad
+  \tilde{y}^\top \Omega^{-1} \tilde{y} = \frac{1}{1-\rho^2} \left( \sum_{i=1}^{k} \tilde{y}_i^2 - 2\rho \sum_{i=1}^{k-1} \tilde{y}_i \tilde{y}_{i+1} + \rho^2 \sum_{i=2}^{k-1} \tilde{y}_i^2 \right).
+\end{equation}
+%
+The log-likelihood Eq.~\ref{eq:ll2} can now be rewritten as,
+%
+\begin{equation}
+ l = -\frac{k}{2}\log(2\pi) - \sum_{i=1}^{k} \log(\sigma_i) - \frac{k-1}{2}\log(1-\rho^2) - \frac{1}{2(1-\rho^2)} \left( \sum_{i=1}^{k} \tilde{y}_i^2 - 2 \rho \sum_{i=1}^{k-1} \tilde{y}_i \tilde{y}_{i+1} + \rho^2 \sum_{i=2}^{k-1} \tilde{y}_i^2 \right).
+ \label{eq:llAR}
+\end{equation}
+%
+The derivitates are now,
+%
+\begin{equation}
+  \frac{\partial l}{\partial \mu_i} = \frac{1}{\sigma_i(1-\rho^2)}
+  \left( \tilde{y}_i
+         - \underbrace{\rho\tilde{y}_{i-1}}_{\text{if} \: i \neq 1}
+         - \underbrace{\rho\tilde{y}_{i+1}}_{\text{if} \: i \neq k}
+         + \underbrace{\rho^2\tilde{y}_i}_{\text{if} \: 1 < i < k}
+  \right),
+\end{equation}
+%
+and
+%
+\begin{equation}
+  \frac{\partial l}{\partial \sigma_i} = - \frac{1}{\sigma_i} + \frac{\tilde{y}_i}{\sigma_i(1-\rho^2)}
+  \left( \tilde{y}_i
+         - \underbrace{\rho\tilde{y}_{i-1}}_{\text{if} \: i \neq 1}
+         - \underbrace{\rho\tilde{y}_{i+1}}_{\text{if} \: i \neq k}
+         + \underbrace{\rho^2\tilde{y}_i}_{\text{if} \: 1 < i < k}
+  \right),
+\end{equation}
+%
+and
+%
+\begin{equation}
+  \frac{\partial l}{\partial \rho}
+  = \frac{(k-1)\rho}{1-\rho^2}
+  + \frac{1}{1-\rho^2} \left( \sum_{i=1}^{k-1} \tilde{y}_i \tilde{y}_{i+1} - \rho \sum_{i=2}^{k-1} \tilde{y}_i^2  \right)
+  - \frac{\rho}{(1-\rho^2)^2} \left( \sum_{i=1}^{k} \tilde{y}_i^2 - 2\rho \sum_{i=1}^{k-1} \tilde{y}_i \tilde{y}_{i+1} + \rho^2 \sum_{i=2}^{k-1} \tilde{y}_i^2 \right).
+\end{equation}
+\end{document}
+
