@@ -2,6 +2,7 @@
 \usepackage{fullpage}
 %\linespread{1.25}
 %\usepackage{xcolor}
+\usepackage{bbm}
 \usepackage{amsmath}
 \usepackage{hyperref}
 %\usepackage[round]{natbib}
@@ -216,5 +217,163 @@ and
   + \frac{1}{1-\rho^2} \left( \sum_{i=1}^{k-1} \tilde{y}_i \tilde{y}_{i+1} - \rho \sum_{i=2}^{k-1} \tilde{y}_i^2  \right)
   - \frac{\rho}{(1-\rho^2)^2} \left( \sum_{i=1}^{k} \tilde{y}_i^2 - 2\rho \sum_{i=1}^{k-1} \tilde{y}_i \tilde{y}_{i+1} + \rho^2 \sum_{i=2}^{k-1} \tilde{y}_i^2 \right).
 \end{equation}
+
+
+\newpage
+\section{Cholesky Parametrisation}
+
+Any symmetric positive definite matrix can be decomposed as the product of a
+lower triangular matrix $L$ and its transpose $L^\top$. In this manner 
+we can write the covariance matrix $\Sigma$ as
+%
+\begin{equation}
+ \Sigma = L L^\top
+ \qquad \text{,} \qquad
+ \Sigma^{-1} = (L^{-1})^\top L^{-1}.
+\end{equation}
+%
+Equation \ref{eq:ll1} for the log-likelihood can be rewritten in terms of $L$ as 
+%
+\begin{equation}
+ l(\mu, L|y) = -\frac{k}{2}\log(2\pi) - \frac{1}{2}\log(|L L^\top|) - \frac{1}{2} (y-\mu)^\top 
+	(L L^\top)^{-1} (y-\mu).
+ \label{eq:ll_chol}
+\end{equation}
+%
+Since $|A B| = |A| |B|$, $|A^n| = |A|^n$ and $|A^\top| = |A|$, the 
+log-likelihood can be formulated in terms of $L^{-1}$ instead of 
+both $L$ and $L^{-1}$:
+%
+\begin{equation}
+	l(\mu, L^{-1}|y) = -\frac{k}{2}\log(2\pi) + \log(|L^{-1}|) 
+	- \frac{1}{2} (y-\mu)^\top (L^{-1})^\top L^{-1} (y-\mu).
+ \label{eq:ll_choles}
+\end{equation}
+%
+
+The derivative of Eq. \ref{eq:ll_choles} with respect to $\mu$ is the same 
+as in Eq. \ref{eq:mu}, with $\Sigma^{-1} =  (L^{-1})^\top L^{-1}$:
+%
+\begin{equation}
+ \frac{\partial l}{\partial \mu} = (L^{-1})^\top L^{-1} (y-\mu).
+ \label{eq:mu_chol}
+\end{equation}
+%
+The partial derivatives of the log-likelihood with respect to elements of 
+$L^{-1}$ require a little more computation. Since $L$ is lower triangular, 
+$L^{-1}$ is upper triangular. We define the nontrivial entries of $L^{-1}$ 
+to be $\lambda_{ij}$ with $1 \leq i \leq j \leq k$: 
+%
+\begin{equation}
+  \L^{-1}=
+  \begin{pmatrix}
+    \lambda_{11} & \lambda_{12} & \lambda_{13} & \cdots & \lambda_{1k} \\
+    0 & \lambda_{22} & \lambda_{23} & \cdots & \lambda_{2k} \\
+    0 & 0 & \lambda_{33} & \cdots & \lambda_{3k} \\
+    \vdots & \vdots & \vdots & \ddots & \vdots \\
+    0 & 0 & 0 & \cdots & \lambda_{kk}
+  \end{pmatrix}.
+\end{equation}
+%
+Furthermore, let $y-\mu = \tilde{y}$ with elements $\tilde{y}_i$ for 
+$i = 1, 2, \dots, k$. 
+Of the three terms in Eq. \ref{eq:ll_choles}, the first is constant and the 
+second simplifies to $\sum_{i=1}^k \log{\lambda_{ii}}$, i.e.\ depends only 
+on the diagonal elements of $L^{-1}$. Let us investigate the third term, which 
+is equivalent to $-1/2 z^\top z$, where z is given by:
+%
+\begin{equation}
+	z = \L^{-1} \tilde{y}=
+  \begin{pmatrix}
+    \lambda_{11} & \lambda_{12} & \lambda_{13} & \cdots & \lambda_{1k} \\
+    0 & \lambda_{22} & \lambda_{23} & \cdots & \lambda_{2k} \\
+    0 & 0 & \lambda_{33} & \cdots & \lambda_{3k} \\
+    \vdots & \vdots & \vdots & \ddots & \vdots \\
+    0 & 0 & 0 & \cdots & \lambda_{kk}
+  \end{pmatrix}
+  \begin{pmatrix}
+    \tilde{y}_1 \\
+    \tilde{y}_2 \\
+    \tilde{y}_3	\\
+    \vdots \\
+    \tilde{y}_k
+  \end{pmatrix}.
+\end{equation}
+%
+We see that 
+%
+\begin{equation}
+	z =
+  \begin{pmatrix}
+    \sum_{j=1}^k (\tilde{y}_j \lambda_{1j}) \\
+    \sum_{j=2}^k (\tilde{y}_j \lambda_{2j}) \\
+    \sum_{j=3}^k (\tilde{y}_j \lambda_{3j}) \\
+    \vdots \\
+    \sum_{j=k}^k (\tilde{y}_j \lambda_{kj}) 
+  \end{pmatrix}
+  \qquad \text{and} \qquad
+  z^\top z =
+	\sum_{i=1}^k \left( \sum_{j=i}^k \left( \tilde{y}_j \lambda_{ij} \right) \right)^2.
+\end{equation}
+%
+Now we can rewrite the log-likelihood (Eq. \ref{eq:ll_choles}) in terms of the 
+elements, $\lambda_{ij}$, of $L^{-1}$ to calculate the partial derivatives:
+%
+\begin{equation}
+	l(\mu, L^{-1}|y) = -\frac{k}{2}\log(2\pi) + \sum_{i=1}^k 
+	\log{\lambda_{ii}} - \frac{1}{2} \sum_{i=1}^k 
+	\left( \sum_{j=i}^k \left( \tilde{y}_j \lambda_{ij} 
+	\right) \right)^2.
+ \label{eq:ll_chol_terms}
+\end{equation}
+%
+For the case where $m \neq n$, 
+%
+\begin{equation}
+  \frac{\partial l}{\partial \lambda_{mn}} = 
+  -\frac{1}{2} \sum_{i=1}^k \left[2 \left(\sum_{j=i}^k (\tilde{y}_j \lambda_{ij}) 
+	\right) \tilde{y}_n \mathbbm{1}_m(i) \right] = 
+  - \tilde{y}_n \sum_{j = m}^{k} \left( \tilde{y}_i \lambda_{mj} \right).	
+\end{equation}
+%
+If $m = n$, the second term in the log-likelihood also has nonzero partial 
+derivative with respect to $\lambda_{mn}$ and
+%
+\begin{equation}
+  \frac{\partial l}{\partial \lambda_{mm}} = 
+	\frac{1}{\lambda_{mm}}- \tilde{y}_m \sum_{j = m}^{k} 
+	\left( \tilde{y}_j \lambda_{mj} \right).	
+\end{equation}.
+
+Since all entries on the main diagonal of $L^{-1}$ must be positive 
+(i.e.\ $\lambda_{mm} > 0$), we use a log link function. For the 
+off diagonal entries we use an identity link. Then
+%
+\begin{equation}
+	\log(\lambda_{mm}) = \eta_{mm} \qquad \text{and} \qquad  
+        \lambda_{mn} = \eta_{mn},
+\end{equation}
+%
+resulting in 
+%
+\begin{equation}
+  \frac{\partial l}{\partial \eta_{mm}} = 
+	1 - \lambda_{mm} \tilde{y}_m \sum_{j=m}^k (\tilde{y}_j \lambda_{mj})
+  \qquad \text{and} \qquad
+  \frac{\partial l}{\partial \lambda_{mn}} = 
+	- \tilde{y}_n \sum_{j = m}^{k} \left( \tilde{y}_i \lambda_{mj} \right).
+\end{equation}
+%
+For the the $\mu$ vector we also utilise an identity link 
+$\mu_i = \eta_{\mu,i}$ and Eq. \ref{eq:mu_chol} becomes
+%
+\begin{equation}
+  \frac{\partial l}{\partial \eta_{\mu, i}} = 
+	\sum_{j=1}^k \varsigma_{ij} \tilde{y}_j, 
+\end{equation}
+%
+where $\varsigma_{ij}$ refers to the corresponding element of 
+$\Sigma^{-1} = (L^{-1})^\top L^{-1}$.
+
 \end{document}
 
