@@ -241,7 +241,7 @@ Equation \ref{eq:ll1} for the log-likelihood can be rewritten in terms of $L$ as
 \end{equation}
 %
 Since $|A B| = |A| |B|$, $|A^n| = |A|^n$ and $|A^\top| = |A|$, the 
-log-likelihood can be formulated in terms of $L^{-1}$ instead of 
+log-likelihood can be formulated in terms of only $L^{-1}$ instead of 
 both $L$ and $L^{-1}$:
 %
 \begin{equation}
@@ -275,7 +275,7 @@ to be $\lambda_{ij}$ with $1 \leq i \leq j \leq k$:
   \end{pmatrix}.
 \end{equation}
 %
-Furthermore, let $y-\mu = \tilde{y}$ with elements $\tilde{y}_i$ for 
+Furthermore, let $\tilde{y} = y - \mu$ with elements $\tilde{y}_i$ for 
 $i = 1, 2, \dots, k$. 
 Of the three terms in Eq. \ref{eq:ll_choles}, the first is constant and the 
 second simplifies to $\sum_{i=1}^k \log{\lambda_{ii}}$, i.e.\ depends only 
@@ -350,22 +350,25 @@ Since all entries on the main diagonal of $L^{-1}$ must be positive
 off diagonal entries we use an identity link. Then
 %
 \begin{equation}
-	\log(\lambda_{mm}) = \eta_{\lambda,mm} \qquad \text{and} \qquad  
+	\log(\lambda_{mm}) = \eta_{\lambda,mm}, \quad
+        \frac{\partial l}{\partial \eta_{\lambda,mm}} =
+	\frac{\partial l}{\partial \lambda_{mm}} \lambda_{mm}
+	\qquad \text{and} \qquad  
         \lambda_{mn} = \eta_{\lambda,mn},
 \end{equation}
 %
 resulting in 
 %
 \begin{equation}
-  \frac{\partial l}{\partial \eta_{\lambda,mm}} = 
-	1 - \lambda_{mm} \tilde{y}_m \sum_{j=m}^k (\tilde{y}_j \lambda_{mj})
+  \frac{\partial l}{\partial \eta_{\lambda,mm}} =
+  1 - \lambda_{mm} \tilde{y}_m \sum_{j=m}^k (\tilde{y}_j \lambda_{mj})
   \qquad \text{and} \qquad
   \frac{\partial l}{\partial \eta_{\lambda,mn}} = 
 	- \tilde{y}_n \sum_{j = m}^{k} \left( \tilde{y}_i \lambda_{mj} \right).
 \end{equation}
 %
-For the the $\mu$ vector we also utilise an identity link 
-$\mu_i = \eta_{\mu,i}$ and Eq. \ref{eq:mu_chol} becomes
+For the $\mu$ vector an identity link, 
+$\mu_i = \eta_{\mu,i}$, also suffices and Eq. \ref{eq:mu_chol} becomes
 %
 \begin{equation}
   \frac{\partial l}{\partial \eta_{\mu, i}} = 
