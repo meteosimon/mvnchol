@@ -1,0 +1,6 @@
+# dont ignore this file
+!.gitignore
+
+# targets
+techreport/*.pdf
+

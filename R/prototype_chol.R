@@ -1,0 +1,87 @@
+#' Cholesky MVN
+#'
+#' BAMLSS Family for MVN with Cholesky Parameterization
+#'
+#' This is a prototype implementation of a BAMLSS family that models
+#' a multivariate Normal (Gaussian) distribution by a Cholesky
+#' decomposition of the covariance matrix.
+#'
+mvn_chol <- function(k = 2, ...) {
+  # --- set names of distributional parameters ---
+  mu <- paste0("mu", seq_len(k))
+  lamdiag <- paste0("lamdiag", seq_len(k))
+  lambda <- combn(seq_len(k), 2, function(x) paste0("lambda", x[1], x[2]))
+  k_lambda <- k * (k-1) / 2    ## number of lambda parameters
+
+  # --- set names of link functions ---
+  links <- c(
+    rep("identity", k),
+    rep("log", k),
+    rep("identity", k_rho)
+  )
+  names(links) <- c(mu, lamdiag, lambda)
+
+  # --- family list ---
+  rval <- list(
+    "family" = "mvnchol",
+    "names"  = c(mu, lamdiag, lambda),   # set names of dist parameters
+    "links"  = links,
+    "d" = function(y, par, log = FALSE) {
+      d <- log_dmvnchol(y, par)
+      if(!log)
+        d <- exp(d)
+      return(d)
+    } 
+  )
+
+  # --- add score funcitons ---
+  mu_score_calls <- paste0(
+    "function(y, par, ...) {mu_score_mvnchol(y, par, j = ", seq_len(k),")}"
+  )
+  lamdiag_score_calls <- paste0(
+    "function(y, par, ...) {lamdiag_score_mvnchol(y, par, j = ", seq_len(k),")}"
+  )
+  lambda_score_calls <- combn(seq_len(k), 2, function(x) {paste0(
+    "function(y, par, ...) {lambda_score_mvnchol(y, par, i = ", x[1],", j = ", x[2],")}"
+  )})
+
+  scores <- list()
+  for(j in seq_along(mu)) {
+    scores[[mu[j]]] <- eval(parse(text = mu_score_calls[j]))
+  }
+  for(j in seq_along(lamdiag)) {
+    scores[[lamdiag[j]]] <- eval(parse(text = lamdiag_score_calls[j]))
+  }
+  for(j in seq_along(lambda)) {
+    scores[[lambda[j]]] <- eval(parse(text = lambda_score_calls[j]))
+  }
+  rval$score <- scores
+
+  # --- set class and return ---
+  class(rval) <- "family.bamlss"
+  rval
+}
+
+#' @param y amatrix n x k.
+#' @param par a list with k elements named like the parameters of the family,
+#'            each element is a numeric vector of length n.
+log_dmvnchol <- function(y, par) {
+  # TODO: Vectorized version of Eq. 26 goes here
+}
+
+#' @param j dimension of parameter
+mu_score_mvnchol <- function(y, par, j) {
+  # TODO: Vectorized version of Eq. 36 goes here
+}
+
+lamdiag_score_mvnchol <- function(y, par, j) {
+  # TODO: Vectorized version of Eq. 35 (left) goes here
+}
+
+#' @param i dimension of parameter
+lambda_score_mvnchol <- function(y, par, i, j) {
+  # TODO: Vectorized version of Eq. 35 (right) goes here
+}
+
+
+
