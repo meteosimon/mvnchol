@@ -63,10 +63,34 @@ mvn_chol <- function(k = 2, ...) {
 }
 
 #' @param y amatrix n x k.
-#' @param par a list with k elements named like the parameters of the family,
+#' @param par a list with k+k+k(k-1)/2 elements named like the parameters of the family,
 #'            each element is a numeric vector of length n.
 log_dmvnchol <- function(y, par) {
-  # TODO: Vectorized version of Eq. 26 goes here
+  n <- nrow(y) # number of observations
+  k <- ncol(y) # dimension of gaussian distribution
+  mu <- paste0("mu", seq_len(k))
+  lamdiag <- paste0("lamdiag", seq_len(k))
+  lambda <- combn(seq_len(k), 2, function(x) paste0("lambda", x[1], x[2]))
+  par_full <- do.call("cbind", par)
+  term_1 <- -k / 2 * log(2 * pi)
+  term_2 <- apply(subset(par_full, select = lamdiag), 1, sum)     
+  term_3 <- vector(length = n) # initialise term_3 vector
+  y_til <- y - subset(par_full, select = mu)
+  for (ni in 1:n) {
+    y_tild <- y_til[ni, ]
+    L_inv <- matrix(0, nrow = k, ncol = k) # initialise L^-1 matrix
+    for (l in 1:length(lambda)) { # assign off diagonal values
+      i <- combn(k, 2)[1, l]
+      j <- combn(k, 2)[2, l]
+      L_inv[i, j] <- par[[paste0("lambda", i, j)]][ni]
+    }  
+    for (i in 1:length(lamdiag)) {
+      L_inv[i, i] <- exp(par[[paste0("lamdiag", i)]][ni])
+    }
+    term_3[ni] <- -1 / 2 * norm(L_inv %*% y_tild, type = 2) ^ 2   
+  }
+  ll <- term_1 + term_2 + term_3
+  return(ll)
 }
 
 #' @param j dimension of parameter
