@@ -17,7 +17,7 @@ mvn_chol <- function(k = 2, ...) {
   links <- c(
     rep("identity", k),
     rep("log", k),
-    rep("identity", k_rho)
+    rep("identity", k_lambda)
   )
   names(links) <- c(mu, lamdiag, lambda)
 
