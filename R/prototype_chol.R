@@ -95,16 +95,86 @@ log_dmvnchol <- function(y, par) {
 
 #' @param j dimension of parameter
 mu_score_mvnchol <- function(y, par, j) {
-  # TODO: Vectorized version of Eq. 36 goes here
-}
+  n <- nrow(y) # number of observations
+  k <- ncol(y) # dimension of gaussian distribution
+  mu <- paste0("mu", seq_len(k))
+  lamdiag <- paste0("lamdiag", seq_len(k))
+  lambda <- combn(seq_len(k), 2, function(x) paste0("lambda", x[1], x[2]))
+  par_full <- do.call("cbind", par)
+  y_til <- y - subset(par_full, select = mu)
+  dl_dmu <- vector(length = n)
+  for (ni in 1:n) {
+    y_tild <- y_til[ni, ]
+    L_inv <- matrix(0, nrow = k, ncol = k) # initialise L^-1 matrix
+    temp <- combn(k, 2)
+    for (l in 1:length(lambda)) { # assign off diagonal values
+      ii <- temp[1, l]
+      jj <- temp[2, l]
+      L_inv[ii, jj] <- par[[paste0("lambda", ii, jj)]][ni]
+    }
+    for (ii in 1:length(lamdiag)) {
+      L_inv[ii, ii] <- exp(par[[paste0("lamdiag", ii)]][ni])
+    }
+    Sigma_inv <- t(L_inv) %*% L_inv
+    dl_dmu[ni] <- sum(Sigma_inv[j, ] * y_tild)
+  }
+  return(dl_dmu)
+}      	
 
 lamdiag_score_mvnchol <- function(y, par, j) {
-  # TODO: Vectorized version of Eq. 35 (left) goes here
+  n <- nrow(y) # number of observations
+  k <- ncol(y) # dimension of gaussian distribution
+  mu <- paste0("mu", seq_len(k))
+  lamdiag <- paste0("lamdiag", seq_len(k))
+  lambda <- combn(seq_len(k), 2, function(x) paste0("lambda", x[1], x[2]))
+  par_full <- do.call("cbind", par)
+  y_til <- y - subset(par_full, select = mu)
+  dl_dlamdiag <- vector(length = n)
+  for (ni in 1:n) {
+    y_tild <- y_til[ni, ]
+    L_inv <- matrix(0, nrow = k, ncol = k) # initialise L^-1 matrix
+    temp <- combn(k, 2)
+    for (l in 1:length(lambda)) { # assign off diagonal values
+      ii <- temp[1, l]
+      jj <- temp[2, l]
+      L_inv[ii, jj] <- par[[paste0("lambda", ii, jj)]][ni]
+    }
+    for (ii in 1:length(lamdiag)) {
+      L_inv[ii, ii] <- exp(par[[paste0("lamdiag", ii)]][ni])
+    }
+    dl_dlamdiag[ni] <- 1 - L_inv[j, j] * y_tild[j] * 
+	               sum(y_tild[j:k] * L_inv[j, j:k])
+  }
+  return(dl_dlamdiag)
 }
 
 #' @param i dimension of parameter
 lambda_score_mvnchol <- function(y, par, i, j) {
-  # TODO: Vectorized version of Eq. 35 (right) goes here
+  n <- nrow(y) # number of observations
+  k <- ncol(y) # dimension of gaussian distribution
+  mu <- paste0("mu", seq_len(k))
+  lamdiag <- paste0("lamdiag", seq_len(k))
+  lambda <- combn(seq_len(k), 2, function(x) paste0("lambda", x[1], x[2]))
+  par_full <- do.call("cbind", par)
+  y_til <- y - subset(par_full, select = mu)
+  dl_dlambda <- vector(length = n)
+  for (ni in 1:n) {
+    y_tild <- y_til[ni, ]
+    L_inv <- matrix(0, nrow = k, ncol = k) # initialise L^-1 matrix
+    temp <- combn(k, 2)
+    for (l in 1:length(lambda)) { # assign off diagonal values
+      ii <- temp[1, l]
+      jj <- temp[2, l]
+      L_inv[ii, jj] <- par[[paste0("lambda", ii, jj)]][ni]
+    }
+    for (ii in 1:length(lamdiag)) {
+      L_inv[ii, ii] <- exp(par[[paste0("lamdiag", ii)]][ni])
+    }
+    dl_dlambda[ni] <- - y_tild[j] *
+                       sum(y_tild[i:k] * L_inv[i, i:k])
+  }
+  return(dl_dlambda) 
+
 }
 
 

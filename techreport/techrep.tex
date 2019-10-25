@@ -261,11 +261,12 @@ as in Eq. \ref{eq:mu}, with $\Sigma^{-1} =  (L^{-1})^\top L^{-1}$:
 %
 The partial derivatives of the log-likelihood with respect to elements of 
 $L^{-1}$ require a little more computation. Since $L$ is lower triangular, 
-$L^{-1}$ is upper triangular. We define the nontrivial entries of $L^{-1}$ 
-to be $\lambda_{ij}$ with $1 \leq i \leq j \leq k$: 
+$L^{-1}$ is also lower triangular and $(L^{-1})^\top$ is upper triangular. 
+We define the nontrivial entries of $(L^{-1})^\top$ to be $\lambda_{ij}$ 
+with $1 \leq i \leq j \leq k$: 
 %
 \begin{equation}
-  \L^{-1}=
+	(L^{-1})^\top=
   \begin{pmatrix}
     \lambda_{11} & \lambda_{12} & \lambda_{13} & \cdots & \lambda_{1k} \\
     0 & \lambda_{22} & \lambda_{23} & \cdots & \lambda_{2k} \\
@@ -283,13 +284,13 @@ on the diagonal elements of $L^{-1}$. Let us investigate the third term, which
 is equivalent to $-1/2 z^\top z$, where z is given by:
 %
 \begin{equation}
-	z = \L^{-1} \tilde{y}=
+	z = L^{-1} \tilde{y}=
   \begin{pmatrix}
-    \lambda_{11} & \lambda_{12} & \lambda_{13} & \cdots & \lambda_{1k} \\
-    0 & \lambda_{22} & \lambda_{23} & \cdots & \lambda_{2k} \\
-    0 & 0 & \lambda_{33} & \cdots & \lambda_{3k} \\
+    \lambda_{11} & 0 & 0 & \cdots & 0 \\
+    \lambda_{12} & \lambda_{22} & 0 & \cdots & 0 \\
+    \lambda_{13} & \lambda_{23} & \lambda_{33} & \cdots & 0 \\
     \vdots & \vdots & \vdots & \ddots & \vdots \\
-    0 & 0 & 0 & \cdots & \lambda_{kk}
+    \lambda_{1k} & \lambda_{2k} & \lambda_{3k} & \cdots & \lambda_{kk}
   \end{pmatrix}
   \begin{pmatrix}
     \tilde{y}_1 \\
@@ -305,15 +306,15 @@ We see that
 \begin{equation}
 	z =
   \begin{pmatrix}
-    \sum_{j=1}^k (\tilde{y}_j \lambda_{1j}) \\
-    \sum_{j=2}^k (\tilde{y}_j \lambda_{2j}) \\
-    \sum_{j=3}^k (\tilde{y}_j \lambda_{3j}) \\
+    \sum_{i=1}^1 (\tilde{y}_i \lambda_{i1}) \\
+    \sum_{i=1}^2 (\tilde{y}_i \lambda_{i2}) \\
+    \sum_{i=1}^3 (\tilde{y}_i \lambda_{i3}) \\
     \vdots \\
-    \sum_{j=k}^k (\tilde{y}_j \lambda_{kj}) 
+    \sum_{i=1}^k (\tilde{y}_i \lambda_{ik}) 
   \end{pmatrix}
   \qquad \text{and} \qquad
   z^\top z =
-	\sum_{i=1}^k \left( \sum_{j=i}^k \left( \tilde{y}_j \lambda_{ij} \right) \right)^2.
+	\sum_{j=1}^k \left( \sum_{i=1}^j \left( \tilde{y}_i \lambda_{ij} \right) \right)^2.
 \end{equation}
 %
 Now we can rewrite the log-likelihood (Eq. \ref{eq:ll_choles}) in terms of the 
@@ -321,8 +322,8 @@ elements, $\lambda_{ij}$, of $L^{-1}$ to calculate the partial derivatives:
 %
 \begin{equation}
 	l(\mu, L^{-1}|y) = -\frac{k}{2}\log(2\pi) + \sum_{i=1}^k 
-	\log{\lambda_{ii}} - \frac{1}{2} \sum_{i=1}^k 
-	\left( \sum_{j=i}^k \left( \tilde{y}_j \lambda_{ij} 
+	\log{\lambda_{ii}} - \frac{1}{2} \sum_{j=1}^k 
+	\left( \sum_{i=1}^j \left( \tilde{y}_i \lambda_{ij} 
 	\right) \right)^2.
  \label{eq:ll_chol_terms}
 \end{equation}
@@ -331,9 +332,9 @@ For the case where $m \neq n$,
 %
 \begin{equation}
   \frac{\partial l}{\partial \lambda_{mn}} = 
-  -\frac{1}{2} \sum_{i=1}^k \left[2 \left(\sum_{j=i}^k (\tilde{y}_j \lambda_{ij}) 
-	\right) \tilde{y}_n \mathbbm{1}_m(i) \right] = 
-  - \tilde{y}_n \sum_{j = m}^{k} \left( \tilde{y}_j \lambda_{mj} \right).	
+  -\frac{1}{2} \sum_{j=1}^k \left[2 \left(\sum_{i=1}^j (\tilde{y}_i \lambda_{ij}) 
+	\right) \tilde{y}_m \mathbbm{1}_n(j) \right] = 
+  - \tilde{y}_m \sum_{i = 1}^{n} \left( \tilde{y}_i \lambda_{in} \right).	
 \end{equation}
 %
 If $m = n$, the second term in the log-likelihood also has nonzero partial 
@@ -341,8 +342,8 @@ derivative with respect to $\lambda_{mn}$ and
 %
 \begin{equation}
   \frac{\partial l}{\partial \lambda_{mm}} = 
-	\frac{1}{\lambda_{mm}}- \tilde{y}_m \sum_{j = m}^{k} 
-	\left( \tilde{y}_j \lambda_{mj} \right).	
+	\frac{1}{\lambda_{mm}}- \tilde{y}_m \sum_{i = 1}^{m} 
+	\left( \tilde{y}_i \lambda_{im} \right).	
 \end{equation}.
 
 Since all entries on the main diagonal of $L^{-1}$ must be positive 
@@ -361,10 +362,10 @@ resulting in
 %
 \begin{equation}
   \frac{\partial l}{\partial \eta_{\lambda,mm}} =
-  1 - \lambda_{mm} \tilde{y}_m \sum_{j=m}^k (\tilde{y}_j \lambda_{mj})
+  1 - \lambda_{mm} \tilde{y}_m \sum_{i=1}^m (\tilde{y}_i \lambda_{im})
   \qquad \text{and} \qquad
   \frac{\partial l}{\partial \eta_{\lambda,mn}} = 
-	- \tilde{y}_n \sum_{j = m}^{k} \left( \tilde{y}_j \lambda_{mj} \right).
+	- \tilde{y}_m \sum_{i = 1}^{n} \left( \tilde{y}_i \lambda_{in} \right).
 \end{equation}
 %
 For the $\mu$ vector an identity link, 
