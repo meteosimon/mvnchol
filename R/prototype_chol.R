@@ -82,7 +82,7 @@ log_dmvnchol <- function(y, par) {
     for (l in 1:length(lambda)) { # assign off diagonal values
       i <- combn(k, 2)[1, l]
       j <- combn(k, 2)[2, l]
-      L_inv[i, j] <- par[[paste0("lambda", i, j)]][ni]
+      L_inv[j, i] <- par[[paste0("lambda", i, j)]][ni] # j,i since lower trian
     }  
     for (i in 1:length(lamdiag)) {
       L_inv[i, i] <- exp(par[[paste0("lamdiag", i)]][ni])
@@ -110,7 +110,7 @@ mu_score_mvnchol <- function(y, par, j) {
     for (l in 1:length(lambda)) { # assign off diagonal values
       ii <- temp[1, l]
       jj <- temp[2, l]
-      L_inv[ii, jj] <- par[[paste0("lambda", ii, jj)]][ni]
+      L_inv[jj, ii] <- par[[paste0("lambda", ii, jj)]][ni]
     }
     for (ii in 1:length(lamdiag)) {
       L_inv[ii, ii] <- exp(par[[paste0("lamdiag", ii)]][ni])
@@ -137,13 +137,13 @@ lamdiag_score_mvnchol <- function(y, par, j) {
     for (l in 1:length(lambda)) { # assign off diagonal values
       ii <- temp[1, l]
       jj <- temp[2, l]
-      L_inv[ii, jj] <- par[[paste0("lambda", ii, jj)]][ni]
+      L_inv[jj, ii] <- par[[paste0("lambda", ii, jj)]][ni]
     }
     for (ii in 1:length(lamdiag)) {
       L_inv[ii, ii] <- exp(par[[paste0("lamdiag", ii)]][ni])
     }
     dl_dlamdiag[ni] <- 1 - L_inv[j, j] * y_tild[j] * 
-	               sum(y_tild[j:k] * L_inv[j, j:k])
+	               sum(y_tild[1:j] * L_inv[1:j, j])
   }
   return(dl_dlamdiag)
 }
@@ -170,8 +170,8 @@ lambda_score_mvnchol <- function(y, par, i, j) {
     for (ii in 1:length(lamdiag)) {
       L_inv[ii, ii] <- exp(par[[paste0("lamdiag", ii)]][ni])
     }
-    dl_dlambda[ni] <- - y_tild[j] *
-                       sum(y_tild[i:k] * L_inv[i, i:k])
+    dl_dlambda[ni] <- - y_tild[i] *
+                       sum(y_tild[1:j] * L_inv[1:j, j])
   }
   return(dl_dlambda) 
 
