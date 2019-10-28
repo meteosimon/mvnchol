@@ -87,7 +87,7 @@ log_dmvnchol <- function(y, par) {
     for (i in 1:length(lamdiag)) {
       L_inv[i, i] <- exp(par[[paste0("lamdiag", i)]][ni])
     }
-    term_3[ni] <- -1 / 2 * norm(L_inv %*% y_tild, type = 2) ^ 2   
+    term_3[ni] <- -1 / 2 * norm(L_inv %*% y_tild, type = "2") ^ 2   
   }
   ll <- term_1 + term_2 + term_3
   return(ll)

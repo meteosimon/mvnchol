@@ -1,5 +1,4 @@
-library("bamlss")
-## Model
+## Simulate test case
 
 ## build orthogonal rotation matrix
 thetax <- pi/4
@@ -19,137 +18,87 @@ n <- 2000
 set.seed(111)
 x0 <- runif(n); x1 <- runif(n); x2 <- runif(n)
 
+## initialize vectors for parameter lists
 p12 <- NULL
 p13 <- NULL
 p23 <- NULL
 sig <- matrix(0, n, 3)
 
+lamdiag <- matrix(0, n, 3)
+lambda <- matrix(0, n, 3)
+
 y <- matrix(0, n, 3)
 ## eigenvalues
 val1 <- f1(x0)
 val2 <- f2(x0)
-val3 <- rep(0,n)
+val3 <- rep(0, n)
+
+log_dens_ref <- rep(0, n)
 
 tau <- .1
 l <- 0
 dens1 <- NULL
 for ( ii in seq(n) ) {
 
-  mu <- rep(0,3)
+  mu <- rep(0, 3)
   
   val <- diag( c(val1[ii], val2[ii], val3[ii]) ) + diag(tau, 3)
   ## compute covariance matrix from rotation matrix and eigenvalues
   cv <- R %*% val %*% t(R)
+
+  ## compute parameters for parameter list
   sig[ii,] <- sqrt(diag(cv))
   p12[ii] <- cv[1,2]
   p13[ii] <- cv[1,3]
   p23[ii] <- cv[2,3]
 
+  ## compute paramters for Cholesky family
+  chol_cv <- chol(cv)
+  lamdiag[ii,] <- diag(chol_cv)
+  lambda[ii,] <- chol_cv[upper.tri(chol_cv)]
+
   ## Check if cv is invertible 
   if ( !is.matrix(try(chol(cv))) ) l <- l + 1
 
-  y[ii,] <- rmvn(1, mu, cv)
+  y[ii,] <- mvtnorm::rmvnorm(1, mu, cv)
 
+  log_dens_ref[ii] <- mvtnorm::dmvnorm(y[ii,], mu, cv, log = TRUE)
 }
 
+## make parameter list for mvn chol family
 par <- list()
-## make parameter list
 par[["mu1"]] <- rep(0,n)
 par[["mu2"]] <- rep(0,n)
 par[["mu3"]] <- rep(0,n)
-par[["sigma1"]] <- sig[,1]
-par[["sigma2"]] <- sig[,2]
-par[["sigma3"]] <- sig[,3]
-par[["rho12"]] <- p12
-par[["rho13"]] <- p13
-par[["rho23"]] <- p23
+par[["lamdiag1"]] <- lamdiag[,1]
+par[["lamdiag2"]] <- lamdiag[,2]
+par[["lamdiag3"]] <- lamdiag[,3]
+par[["lambda12"]] <- lambda[,1]
+par[["lambda13"]] <- lambda[,2]
+par[["lambda23"]] <- lambda[,3]
 
-## plot input
-X11(); par(mfrow = c(2,3))
-plot(sig[,1] ~ x0); plot(sig[,2] ~ x0); plot(sig[,3] ~ x0)
-plot((p12/ (sig[,1]*sig[,2])) ~ x0)
-plot((p13/ (sig[,1]*sig[,3])) ~ x0)
-plot((p23/ (sig[,2]*sig[,3])) ~ x0)
+source("../R/prototype_chol.R")
 
-dat <- data.frame(y1=y[,1],y2=y[,2],y3=y[,3],x=x0)
+dens_fun <- mvn_chol(k = 3)$d
+log_dens <- dens_fun(y, par, log = TRUE)
 
-###################################################################
-library("bamlss")
-load("../data/simmodel2.rda")
+par(mfrow = c(1, 2))
+plot(log_dens, log_dens_ref)
 
-f <- list(
-  y0 ~ 1,
-  y1 ~ 1,
-  y2 ~ 1,
-  sigma1 ~ s(x0),
-  sigma2 ~ s(x0),
-  sigma3 ~ s(x0),
-  rho12 ~ s(x0),
-  rho13 ~ s(x0),
-  rho23 ~ s(x0)
-)
+## make parameter list for mvnorm family
+par2 <- list()
+par2[["mu1"]] <- rep(0,n)
+par2[["mu2"]] <- rep(0,n)
+par2[["mu3"]] <- rep(0,n)
+par2[["sigma1"]] <- sig[,1]
+par2[["sigma2"]] <- sig[,2]
+par2[["sigma3"]] <- sig[,3]
+par2[["rho12"]] <- p12
+par2[["rho13"]] <- p13
+par2[["rho23"]] <- p23
 
-b <- bamlss(f, family = gF("mvnorm", k = 3), data = dat,
-            optimizer = boost, sampler = FALSE,
-            maxit = 500, nu = 0.1, scale.d = TRUE)
+dens_fun2 <- bamlss::mvnorm_bamlss(k = 3)$d
+log_dens2 <- dens_fun2(y, par2, log = TRUE)
 
-b <- bamlss(f, family = mvnorm_bamlss(k = 3), data = dat,
-            optimizer = boost, sampler = FALSE,
-            maxit = 500, nu = 0.1, scale.d = TRUE)
-
-
-X11(); plot(b, ask=FALSE, pages=1)
-###################################################################
-
-
-s1 <- predict(b, model="sigma1", type="parameter")
-s2 <- predict(b, model="sigma2", type="parameter")
-s3 <- predict(b, model="sigma3", type="parameter")
-r12 <- predict(b, model="rho12", type="parameter")
-r13 <- predict(b, model="rho13", type="parameter")
-r23 <- predict(b, model="rho23", type="parameter")
-
-## plot output
-X11(); par(mfrow=c(2,3))
-plot(s1~x0); plot(s2~x0); plot(s3~x0)
-plot(r12~x0); plot(r13~x0); plot(r23~x0)
-
-###################################################################
-## try to get this parallel
-library("parallel")
-
-dat$chunk <- rep(1:4, each=500)
-models <- list()
-for ( j in seq(4) ) {
-  models[[j]] <- list("fo"=f, "dtrain"=subset(dat, chunk!=j),
-                              "dverif"=subset(dat, chunk==j))
-}
-
-blist <- function(obj, ...) {
-            environment(obj$fo) <- environment()
-            b <- bamlss(formula = obj$fo,
-                     family = gF("mvnorm", k = 3),
-                     data = obj$dtrain,
-                     optimizer = boost, sampler = FALSE,
-                     maxit = 100, nu = 0.1, scale.d = TRUE)
-            return(list("bobj"=b, "test"=obj$dverif))
-}
-
-predict.blist <- function(obj) {
-            fit <- predict(obj$bobj, newdata=obj$test)
-            return(fit)
-}
-
-## Works:
-r <- lapply(models, blist)
-fit <- lapply(r, predict.blist)
-fit.cv <- NULL
-for ( j in seq(4) ) {
-  fit.cv <- rbind(fit.cv, do.call("cbind", fit[[j]]))
-}
-## Does not work:
-## bamlss as 
-res <- mclapply(models, blist, mc.cores=4L,
-         mc.silent=TRUE, mc.allow.recursive=FALSE)
-###################################################################
+plot(log_dens2, log_dens_ref)
 
