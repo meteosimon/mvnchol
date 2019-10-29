@@ -53,7 +53,7 @@ for ( ii in seq(n) ) {
   p23[ii] <- cv[2,3]
 
   ## compute paramters for Cholesky family
-  chol_cv <- chol(cv)
+  chol_cv <- solve(chol(cv))  # lambdas come from L^-1 not L
   lamdiag[ii,] <- diag(chol_cv)
   lambda[ii,] <- chol_cv[upper.tri(chol_cv)]
 
@@ -64,6 +64,11 @@ for ( ii in seq(n) ) {
 
   log_dens_ref[ii] <- mvtnorm::dmvnorm(y[ii,], mu, cv, log = TRUE)
 }
+
+## Data
+d <- as.data.frame(y)
+names(d) <- paste0("y", 0:2)
+d$x0 <- x0
 
 ## make parameter list for mvn chol family
 par <- list()
@@ -82,23 +87,53 @@ source("../R/prototype_chol.R")
 dens_fun <- mvn_chol(k = 3)$d
 log_dens <- dens_fun(y, par, log = TRUE)
 
-par(mfrow = c(1, 2))
 plot(log_dens, log_dens_ref)
 
-## make parameter list for mvnorm family
-par2 <- list()
-par2[["mu1"]] <- rep(0,n)
-par2[["mu2"]] <- rep(0,n)
-par2[["mu3"]] <- rep(0,n)
-par2[["sigma1"]] <- sig[,1]
-par2[["sigma2"]] <- sig[,2]
-par2[["sigma3"]] <- sig[,3]
-par2[["rho12"]] <- p12
-par2[["rho13"]] <- p13
-par2[["rho23"]] <- p23
+## parse family w/o scores through bamlss.frame to
+## get a family with numerical scores
+library(bamlss)
+fam <- mvn_chol(k = 3)
+fam$score <- NULL
+f <- list(y0 ~ s(x0), y1 ~ s(x0), y2 ~ s(x0),
+	  lamdiag1 ~ s(x0), lamdiag2 ~ s(x0), lamdiag3 ~ s(x0),
+	  lambda12 ~ s(x0), lambda13 ~ s(x0), lambda23 ~ s(x0))
+bf <- bamlss.frame(f, family = fam, data = d)
+fam2 <- bf$family
 
-dens_fun2 <- bamlss::mvnorm_bamlss(k = 3)$d
-log_dens2 <- dens_fun2(y, par2, log = TRUE)
+##
+fam <- mvn_chol(k = 3)
+smu1 <- fam$score$mu1(y, par)
+smu2 <- fam2$score$mu1(y, par)
+sld1 <- fam$score$lamdiag1(y, par)
+sld2 <- fam2$score$lamdiag1(y, par)
+sla1 <- fam$score$lambda12(y, par)
+sla2 <- fam2$score$lambda12(y, par)
+# these are all equal (i.e. numerical and analytical scores match)
 
-plot(log_dens2, log_dens_ref)
+## Effects
+x11()
+par(mfrow = c(3, 3))
+
+for (i in 1:3) {
+  for (j in 1:3) {
+    if (i == j) {
+      plot(sort(x0), par[[paste0("lamdiag", i)]][order(x0)])
+    } else {
+      plot(sort(x0), par[[paste0("lambda", min(i, j), max(i, j))]][order(x0)])
+    }
+  }
+}
+
+
+## Model
+fam <- mvn_chol(k = 3)
+bf <- bamlss.frame(f, family = fam, data = d)
+fam <- bf$family
+# fam$score <- NULL
+f <- list(y0 ~ s(x0), y1 ~ s(x0), y2 ~ s(x0),
+	  lamdiag1 ~ s(x0), lamdiag2 ~ s(x0), lamdiag3 ~ s(x0),
+	  lambda12 ~ s(x0), lambda13 ~ s(x0), lambda23 ~ s(x0))
+
+b <- bamlss(, family = fam, data = d, sampler = FALSE, optimizer = boost)
+
 

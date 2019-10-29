@@ -73,9 +73,9 @@ log_dmvnchol <- function(y, par) {
   lambda <- combn(seq_len(k), 2, function(x) paste0("lambda", x[1], x[2]))
   par_full <- do.call("cbind", par)
   term_1 <- -k / 2 * log(2 * pi)
-  term_2 <- apply(subset(par_full, select = lamdiag), 1, sum)     
+  term_2 <- apply(log(subset(par_full, select = lamdiag)), 1, sum)     
   term_3 <- vector(length = n) # initialise term_3 vector
-  y_til <- y - subset(par_full, select = mu)
+  y_til <- as.matrix(y - subset(par_full, select = mu))
   for (ni in 1:n) {
     y_tild <- y_til[ni, ]
     L_inv <- matrix(0, nrow = k, ncol = k) # initialise L^-1 matrix
@@ -85,7 +85,7 @@ log_dmvnchol <- function(y, par) {
       L_inv[j, i] <- par[[paste0("lambda", i, j)]][ni] # j,i since lower trian
     }  
     for (i in 1:length(lamdiag)) {
-      L_inv[i, i] <- exp(par[[paste0("lamdiag", i)]][ni])
+      L_inv[i, i] <- par[[paste0("lamdiag", i)]][ni]
     }
     term_3[ni] <- -1 / 2 * norm(L_inv %*% y_tild, type = "2") ^ 2   
   }
@@ -101,7 +101,7 @@ mu_score_mvnchol <- function(y, par, j) {
   lamdiag <- paste0("lamdiag", seq_len(k))
   lambda <- combn(seq_len(k), 2, function(x) paste0("lambda", x[1], x[2]))
   par_full <- do.call("cbind", par)
-  y_til <- y - subset(par_full, select = mu)
+  y_til <- as.matrix(y - subset(par_full, select = mu))
   dl_dmu <- vector(length = n)
   for (ni in 1:n) {
     y_tild <- y_til[ni, ]
@@ -113,7 +113,7 @@ mu_score_mvnchol <- function(y, par, j) {
       L_inv[jj, ii] <- par[[paste0("lambda", ii, jj)]][ni]
     }
     for (ii in 1:length(lamdiag)) {
-      L_inv[ii, ii] <- exp(par[[paste0("lamdiag", ii)]][ni])
+      L_inv[ii, ii] <- par[[paste0("lamdiag", ii)]][ni]
     }
     Sigma_inv <- t(L_inv) %*% L_inv
     dl_dmu[ni] <- sum(Sigma_inv[j, ] * y_tild)
@@ -128,7 +128,7 @@ lamdiag_score_mvnchol <- function(y, par, j) {
   lamdiag <- paste0("lamdiag", seq_len(k))
   lambda <- combn(seq_len(k), 2, function(x) paste0("lambda", x[1], x[2]))
   par_full <- do.call("cbind", par)
-  y_til <- y - subset(par_full, select = mu)
+  y_til <- as.matrix(y - subset(par_full, select = mu))
   dl_dlamdiag <- vector(length = n)
   for (ni in 1:n) {
     y_tild <- y_til[ni, ]
@@ -140,10 +140,10 @@ lamdiag_score_mvnchol <- function(y, par, j) {
       L_inv[jj, ii] <- par[[paste0("lambda", ii, jj)]][ni]
     }
     for (ii in 1:length(lamdiag)) {
-      L_inv[ii, ii] <- exp(par[[paste0("lamdiag", ii)]][ni])
+      L_inv[ii, ii] <- par[[paste0("lamdiag", ii)]][ni]
     }
     dl_dlamdiag[ni] <- 1 - L_inv[j, j] * y_tild[j] * 
-	               sum(y_tild[1:j] * L_inv[1:j, j])
+	               sum(y_tild[1:j] * L_inv[j, 1:j])
   }
   return(dl_dlamdiag)
 }
@@ -156,7 +156,7 @@ lambda_score_mvnchol <- function(y, par, i, j) {
   lamdiag <- paste0("lamdiag", seq_len(k))
   lambda <- combn(seq_len(k), 2, function(x) paste0("lambda", x[1], x[2]))
   par_full <- do.call("cbind", par)
-  y_til <- y - subset(par_full, select = mu)
+  y_til <- as.matrix(y - subset(par_full, select = mu))
   dl_dlambda <- vector(length = n)
   for (ni in 1:n) {
     y_tild <- y_til[ni, ]
@@ -165,13 +165,13 @@ lambda_score_mvnchol <- function(y, par, i, j) {
     for (l in 1:length(lambda)) { # assign off diagonal values
       ii <- temp[1, l]
       jj <- temp[2, l]
-      L_inv[ii, jj] <- par[[paste0("lambda", ii, jj)]][ni]
+      L_inv[jj, ii] <- par[[paste0("lambda", ii, jj)]][ni]
     }
     for (ii in 1:length(lamdiag)) {
-      L_inv[ii, ii] <- exp(par[[paste0("lamdiag", ii)]][ni])
+      L_inv[ii, ii] <- par[[paste0("lamdiag", ii)]][ni]
     }
     dl_dlambda[ni] <- - y_tild[i] *
-                       sum(y_tild[1:j] * L_inv[1:j, j])
+                       sum(y_tild[1:j] * L_inv[j, 1:j])
   }
   return(dl_dlambda) 
 
