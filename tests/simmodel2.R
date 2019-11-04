@@ -110,6 +110,16 @@ sla1 <- fam$score$lambda12(y, par)
 sla2 <- fam2$score$lambda12(y, par)
 # these are all equal (i.e. numerical and analytical scores match)
 
+
+## Model
+f <- list(y0 ~ s(x0), y1 ~ s(x0), y2 ~ s(x0),
+	  lamdiag1 ~ s(x0), lamdiag2 ~ s(x0), lamdiag3 ~ s(x0),
+	  lambda12 ~ s(x0), lambda13 ~ s(x0), lambda23 ~ s(x0))
+
+b <- bamlss(f, family = mvn_chol(k = 3), data = d, sampler = FALSE, optimizer = bfit, eps = 0.001)
+
+fit <- predict(b, type = "parameter")
+
 ## Effects
 x11()
 par(mfrow = c(3, 3))
@@ -117,23 +127,28 @@ par(mfrow = c(3, 3))
 for (i in 1:3) {
   for (j in 1:3) {
     if (i == j) {
-      plot(sort(x0), par[[paste0("lamdiag", i)]][order(x0)])
+      plot(sort(x0), par[[paste0("lamdiag", i)]][order(x0)], type = "l", lwd = 2)
+      lines(sort(x0), fit[[paste0("lamdiag", i)]][order(x0)], col = 2, lty = 2, lwd = 2)
     } else {
-      plot(sort(x0), par[[paste0("lambda", min(i, j), max(i, j))]][order(x0)])
+      plot(sort(x0), par[[paste0("lambda", min(i, j), max(i, j))]][order(x0)], type = "l", lwd = 2)
+      lines(sort(x0), fit[[paste0("lambda", min(i, j), max(i, j))]][order(x0)], col = 2, lty = 2, lwd = 2)
     }
   }
 }
 
+## Demonstration of L_inv property
 
-## Model
-fam <- mvn_chol(k = 3)
-bf <- bamlss.frame(f, family = fam, data = d)
-fam <- bf$family
-# fam$score <- NULL
-f <- list(y0 ~ s(x0), y1 ~ s(x0), y2 ~ s(x0),
-	  lamdiag1 ~ s(x0), lamdiag2 ~ s(x0), lamdiag3 ~ s(x0),
-	  lambda12 ~ s(x0), lambda13 ~ s(x0), lambda23 ~ s(x0))
+corr_data <- mvtnorm::rmvnorm(1000, mu, cv)
+L_inv <- t(solve(chol(cv)))
+uncorr_data <- t(L_inv %*% t(corr_data))
 
-b <- bamlss(, family = fam, data = d, sampler = FALSE, optimizer = boost)
+par(mfrow = c(2,3))
+plot(corr_data[,1] ~ corr_data[,2])
+plot(corr_data[,1] ~ corr_data[,3])
+plot(corr_data[,2] ~ corr_data[,3])
+plot(uncorr_data[,1] ~ uncorr_data[,2])
+plot(uncorr_data[,1] ~ uncorr_data[,3])
+plot(uncorr_data[,2] ~ uncorr_data[,3])
+
 
 
