@@ -9,6 +9,7 @@
 #' @param k integer. The dimension of the multivariate distribution.
 #' @param ... not used.
 #' @return a bamlss family.
+#' @useDynLib bamlssMVN, .registration = TRUE
 #' @export
 mvn_chol <- function(k = 2L, ...) {
   # --- set names of distributional parameters ---

@@ -4,7 +4,7 @@
 #include <R_ext/Rdynload.h>
 
 /* .Call calls */
-SEXP log_dmvnchol(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP log_dmvnchol(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
     {"log_dmvnchol", (DL_FUNC) &log_dmvnchol, 7},
