@@ -69,7 +69,7 @@ mvn_chol <- function(k = 2L, ...) {
 # #' @param y amatrix n x k.
 # #' @param par a list with k+k+k(k-1)/2 elements named like the parameters of the family,
 # #'            each element is a numeric vector of length n.
-log_dmvnchol <- function(y, par) {
+log_dmvnchol_ref <- function(y, par) {
   n <- nrow(y) # number of observations
   k <- ncol(y) # dimension of gaussian distribution
   mu <- paste0("mu", seq_len(k))
@@ -96,6 +96,21 @@ log_dmvnchol <- function(y, par) {
   ll <- term_1 + term_2 + term_3
   return(ll)
 }
+
+log_dmvnchol_C <- function(y, par) {
+  y <- as.matrix(y)
+  n <- nrow(y)
+  k <- ncol(y)
+  np <- names(par)
+  mj <- grep("mu", np)
+  dj <- grep("lamdiag", np)
+  tj <- grep("lambda", np)
+  par <- do.call("cbind", par)
+  .Call("log_dmvnchol", y, par, n, k, mj, dj, tj, PACKAGE = "bamlssMVN")
+}
+
+# choose `log_dmvnchol_ref` or `log_dmvnchol_C` for computing the log-density
+log_dmvnchol <- log_dmvnchol_ref
 
 # #' @param j dimension of parameter
 mu_score_mvnchol <- function(y, par, j) {
