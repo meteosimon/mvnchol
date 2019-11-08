@@ -7,3 +7,8 @@ techreport/*.aux
 techreport/*.log
 techreport/*.out
 
+# compiled code and shared objects
+src/*.so
+src/*.o
+
+

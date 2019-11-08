@@ -15,7 +15,7 @@ MJ column indices for location parameters
 DJ column indices for diagonal elements of L^{-1}
 TJ column indices for element in lower triangle of L^{-1}
 */
-SEXP log_dmvnchol(SEXP Y, SEXP PAR, SEXP N, SEXP K, SEXP MJ, SEXP DJ, SEXP TJ)
+SEXP log_dmvncholC(SEXP Y, SEXP PAR, SEXP N, SEXP K, SEXP MJ, SEXP DJ, SEXP TJ)
 {
 /* Pointers for obs and par */
   double *Yptr = REAL(Y);
@@ -47,7 +47,7 @@ SEXP log_dmvnchol(SEXP Y, SEXP PAR, SEXP N, SEXP K, SEXP MJ, SEXP DJ, SEXP TJ)
   double *dptr = REAL(d);
 
 /* initialize three terms of log-density */
-  double lpi = -0.5 * (float)k * log(2.0 * 3.141592653589793115998);
+  double lpi = -0.5 * (float)k * log(2.0 * 3.14159265358979323846);
   double det = 0.0;
   double nrm = 0.0;
 
@@ -55,7 +55,7 @@ SEXP log_dmvnchol(SEXP Y, SEXP PAR, SEXP N, SEXP K, SEXP MJ, SEXP DJ, SEXP TJ)
    I start with returning a constant vector.
    For checking if the declaration section gives any errors!
 */
-  for(i = 1; i < n; i++) {
+  for(i = 0; i < n; i++) {
     dptr[i] = lpi;
   }
 

@@ -9,8 +9,8 @@
 #' @param k integer. The dimension of the multivariate distribution.
 #' @param ... not used.
 #' @return a bamlss family.
-#' @useDynLib bamlssMVN, .registration = TRUE
 #' @export
+#' @useDynLib bamlssMVN, .registration = TRUE
 mvn_chol <- function(k = 2L, ...) {
   # --- set names of distributional parameters ---
   mu <- paste0("mu", seq_len(k))
@@ -107,7 +107,7 @@ log_dmvnchol_C <- function(y, par) {
   dj <- grep("lamdiag", np)
   tj <- grep("lambda", np)
   par <- do.call("cbind", par)
-  .Call("log_dmvnchol", y, par, n, k, mj, dj, tj, PACKAGE = "bamlssMVN")
+  .Call("log_dmvncholC", y, par, n, k, mj, dj, tj, PACKAGE = "bamlssMVN")
 }
 
 # choose `log_dmvnchol_ref` or `log_dmvnchol_C` for computing the log-density
