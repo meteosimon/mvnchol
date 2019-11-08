@@ -1,6 +1,9 @@
 # dont ignore this file
 !.gitignore
 
-# targets
+# targets and logs
 techreport/*.pdf
+techreport/*.aux
+techreport/*.log
+techreport/*.out
 
