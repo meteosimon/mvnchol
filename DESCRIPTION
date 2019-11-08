@@ -11,6 +11,6 @@ Description: Implements a prototype for a BAMLSS family modelling a multi-variat
              Gaussian distribution via the Cholesky decomposition of its
              co-varaince matrix.
 Depends: R (>= 3.5.0)
+Encoding: UTF-8
 License: GPL-2 | GPL-3
-
-
+RoxygenNote: 6.1.1

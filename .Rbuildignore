@@ -2,5 +2,6 @@
 ^tests
 ^\\.git
 ^\\.gitignore
-^README\\.md
+^README
+^Makefile
 

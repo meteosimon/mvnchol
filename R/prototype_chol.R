@@ -14,7 +14,7 @@ mvn_chol <- function(k = 2L, ...) {
   # --- set names of distributional parameters ---
   mu <- paste0("mu", seq_len(k))
   lamdiag <- paste0("lamdiag", seq_len(k))
-  lambda <- combn(seq_len(k), 2, function(x) paste0("lambda", x[1], x[2]))
+  lambda <- utils::combn(seq_len(k), 2, function(x) paste0("lambda", x[1], x[2]))
   k_lambda <- k * (k-1) / 2    ## number of lambda parameters
 
   # --- set names of link functions ---
@@ -45,7 +45,7 @@ mvn_chol <- function(k = 2L, ...) {
   lamdiag_score_calls <- paste0(
     "function(y, par, ...) {lamdiag_score_mvnchol(y, par, j = ", seq_len(k),")}"
   )
-  lambda_score_calls <- combn(seq_len(k), 2, function(x) {paste0(
+  lambda_score_calls <- utils::combn(seq_len(k), 2, function(x) {paste0(
     "function(y, par, ...) {lambda_score_mvnchol(y, par, i = ", x[1],", j = ", x[2],")}"
   )})
 
@@ -74,7 +74,7 @@ log_dmvnchol <- function(y, par) {
   k <- ncol(y) # dimension of gaussian distribution
   mu <- paste0("mu", seq_len(k))
   lamdiag <- paste0("lamdiag", seq_len(k))
-  lambda <- combn(seq_len(k), 2, function(x) paste0("lambda", x[1], x[2]))
+  lambda <- utils::combn(seq_len(k), 2, function(x) paste0("lambda", x[1], x[2]))
   par_full <- do.call("cbind", par)
   term_1 <- -k / 2 * log(2 * pi)
   term_2 <- apply(log(subset(par_full, select = lamdiag)), 1, sum)     
@@ -84,8 +84,8 @@ log_dmvnchol <- function(y, par) {
     y_tild <- y_til[ni, ]
     L_inv <- matrix(0, nrow = k, ncol = k) # initialise L^-1 matrix
     for (l in 1:length(lambda)) { # assign off diagonal values
-      i <- combn(k, 2)[1, l]
-      j <- combn(k, 2)[2, l]
+      i <- utils::combn(k, 2)[1, l]
+      j <- utils::combn(k, 2)[2, l]
       L_inv[j, i] <- par[[paste0("lambda", i, j)]][ni] # j,i since lower trian
     }  
     for (i in 1:length(lamdiag)) {
@@ -103,14 +103,14 @@ mu_score_mvnchol <- function(y, par, j) {
   k <- ncol(y) # dimension of gaussian distribution
   mu <- paste0("mu", seq_len(k))
   lamdiag <- paste0("lamdiag", seq_len(k))
-  lambda <- combn(seq_len(k), 2, function(x) paste0("lambda", x[1], x[2]))
+  lambda <- utils::combn(seq_len(k), 2, function(x) paste0("lambda", x[1], x[2]))
   par_full <- do.call("cbind", par)
   y_til <- as.matrix(y - subset(par_full, select = mu))
   dl_dmu <- vector(length = n)
   for (ni in 1:n) {
     y_tild <- y_til[ni, ]
     L_inv <- matrix(0, nrow = k, ncol = k) # initialise L^-1 matrix
-    temp <- combn(k, 2)
+    temp <- utils::combn(k, 2)
     for (l in 1:length(lambda)) { # assign off diagonal values
       ii <- temp[1, l]
       jj <- temp[2, l]
@@ -130,14 +130,14 @@ lamdiag_score_mvnchol <- function(y, par, j) {
   k <- ncol(y) # dimension of gaussian distribution
   mu <- paste0("mu", seq_len(k))
   lamdiag <- paste0("lamdiag", seq_len(k))
-  lambda <- combn(seq_len(k), 2, function(x) paste0("lambda", x[1], x[2]))
+  lambda <- utils::combn(seq_len(k), 2, function(x) paste0("lambda", x[1], x[2]))
   par_full <- do.call("cbind", par)
   y_til <- as.matrix(y - subset(par_full, select = mu))
   dl_dlamdiag <- vector(length = n)
   for (ni in 1:n) {
     y_tild <- y_til[ni, ]
     L_inv <- matrix(0, nrow = k, ncol = k) # initialise L^-1 matrix
-    temp <- combn(k, 2)
+    temp <- utils::combn(k, 2)
     for (l in 1:length(lambda)) { # assign off diagonal values
       ii <- temp[1, l]
       jj <- temp[2, l]
@@ -158,14 +158,14 @@ lambda_score_mvnchol <- function(y, par, i, j) {
   k <- ncol(y) # dimension of gaussian distribution
   mu <- paste0("mu", seq_len(k))
   lamdiag <- paste0("lamdiag", seq_len(k))
-  lambda <- combn(seq_len(k), 2, function(x) paste0("lambda", x[1], x[2]))
+  lambda <- utils::combn(seq_len(k), 2, function(x) paste0("lambda", x[1], x[2]))
   par_full <- do.call("cbind", par)
   y_til <- as.matrix(y - subset(par_full, select = mu))
   dl_dlambda <- vector(length = n)
   for (ni in 1:n) {
     y_tild <- y_til[ni, ]
     L_inv <- matrix(0, nrow = k, ncol = k) # initialise L^-1 matrix
-    temp <- combn(k, 2)
+    temp <- utils::combn(k, 2)
     for (l in 1:length(lambda)) { # assign off diagonal values
       ii <- temp[1, l]
       jj <- temp[2, l]
