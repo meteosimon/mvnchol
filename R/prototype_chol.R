@@ -6,7 +6,11 @@
 #' a multivariate Normal (Gaussian) distribution by a Cholesky
 #' decomposition of the covariance matrix.
 #'
-mvn_chol <- function(k = 2, ...) {
+#' @param k integer. The dimension of the multivariate distribution.
+#' @param ... not used.
+#' @return a bamlss family.
+#' @export
+mvn_chol <- function(k = 2L, ...) {
   # --- set names of distributional parameters ---
   mu <- paste0("mu", seq_len(k))
   lamdiag <- paste0("lamdiag", seq_len(k))
@@ -62,9 +66,9 @@ mvn_chol <- function(k = 2, ...) {
   rval
 }
 
-#' @param y amatrix n x k.
-#' @param par a list with k+k+k(k-1)/2 elements named like the parameters of the family,
-#'            each element is a numeric vector of length n.
+# #' @param y amatrix n x k.
+# #' @param par a list with k+k+k(k-1)/2 elements named like the parameters of the family,
+# #'            each element is a numeric vector of length n.
 log_dmvnchol <- function(y, par) {
   n <- nrow(y) # number of observations
   k <- ncol(y) # dimension of gaussian distribution
@@ -93,7 +97,7 @@ log_dmvnchol <- function(y, par) {
   return(ll)
 }
 
-#' @param j dimension of parameter
+# #' @param j dimension of parameter
 mu_score_mvnchol <- function(y, par, j) {
   n <- nrow(y) # number of observations
   k <- ncol(y) # dimension of gaussian distribution
@@ -148,7 +152,7 @@ lamdiag_score_mvnchol <- function(y, par, j) {
   return(dl_dlamdiag)
 }
 
-#' @param i dimension of parameter
+# #' @param i dimension of parameter
 lambda_score_mvnchol <- function(y, par, i, j) {
   n <- nrow(y) # number of observations
   k <- ncol(y) # dimension of gaussian distribution

@@ -1,0 +1,16 @@
+Package: bamlssMVN
+Title: MVN Cholesky family for BAMLSS
+Version: 0.1.0
+Authors@R: c(person(given = "Thomas", family = "Muschinski", role = c("aut", "cre"),
+                    email = "Thomas.Muschinkski@uibk.ac.at",
+                    comment = c(ORCID = "")),
+             person(given = "Thorsten", family = "Simon", role = "aut",
+                    email = "Thorsten.Simon@uibk.ac.at",
+                    comment = c(ORCID = "0000-0002-3778-7738")))
+Description: Implements a prototype for a BAMLSS family modelling a multi-variate
+             Gaussian distribution via the Cholesky decomposition of its
+             co-varaince matrix.
+Depends: R (>= 3.5.0)
+License: GPL-2 | GPL-3
+
+

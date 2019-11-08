@@ -1,0 +1,6 @@
+^techreport
+^tests
+^\\.git
+^\\.gitignore
+^README\\.md
+
