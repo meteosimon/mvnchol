@@ -103,9 +103,9 @@ log_dmvnchol_C <- function(y, par) {
   n <- nrow(y)
   k <- ncol(y)
   np <- names(par)
-  mj <- grep("mu", np)
-  dj <- grep("lamdiag", np)
-  tj <- grep("lambda", np)
+  mj <- sum(grepl("mu", np))
+  dj <- sum(grepl("lamdiag", np))
+  tj <- sum(grepl("lambda", np))
   par <- do.call("cbind", par)
   .Call("log_dmvncholC", y, par, n, k, mj, dj, tj, PACKAGE = "bamlssMVN")
 }

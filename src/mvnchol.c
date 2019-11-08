@@ -11,9 +11,9 @@ Y observations (matrix)
 PAR parameters (matrix)
 N sample size (integer)
 K dimension of multivariate distribution
-MJ column indices for location parameters
-DJ column indices for diagonal elements of L^{-1}
-TJ column indices for element in lower triangle of L^{-1}
+MJ number of columns with location parameters
+DJ number of columns diagonal elements of L^{-1}
+TJ number of columns element in lower triangle of L^{-1}
 */
 SEXP log_dmvncholC(SEXP Y, SEXP PAR, SEXP N, SEXP K, SEXP MJ, SEXP DJ, SEXP TJ)
 {
@@ -56,7 +56,13 @@ SEXP log_dmvncholC(SEXP Y, SEXP PAR, SEXP N, SEXP K, SEXP MJ, SEXP DJ, SEXP TJ)
    For checking if the declaration section gives any errors!
 */
   for(i = 0; i < n; i++) {
-    dptr[i] = lpi;
+/* compute term2 the determinante */
+    det = 0.0;
+    for(j = 0; j < k; j++) {
+      det += PARptr[i + n * (j + mj)];
+    }
+
+    dptr[i] = lpi + det;
   }
 
 /* return */
