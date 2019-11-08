@@ -33,7 +33,7 @@ SEXP log_dmvnchol(SEXP Y, SEXP PAR, SEXP N, SEXP K, SEXP MJ, SEXP DJ, SEXP TJ)
 
 /* inverse of L matrix for single obs */
   SEXP Linv;
-  PROTECT(allocMatrix(REALSXP, k, k);
+  PROTECT(Linv = allocMatrix(REALSXP, k, k));
   double *Linvptr = REAL(Linv);
 
 /* residuals for single obs */
@@ -51,7 +51,10 @@ SEXP log_dmvnchol(SEXP Y, SEXP PAR, SEXP N, SEXP K, SEXP MJ, SEXP DJ, SEXP TJ)
   double det = 0.0;
   double nrm = 0.0;
 
-/* */
+/* HERE comes the code!!!
+   I start with returning a constant vector.
+   For checking if the declaration section gives any errors!
+*/
   for(i = 1; i < n; i++) {
     dptr[i] = lpi;
   }
