@@ -11,6 +11,8 @@ Y observations (matrix)
 PAR parameters (matrix)
 N sample size (integer)
 K dimension of multivariate distribution
+
+Output: Vector of log-densities
 */
 SEXP log_dmvncholC(SEXP Y, SEXP PAR, SEXP N, SEXP K)
 {
@@ -45,10 +47,7 @@ SEXP log_dmvncholC(SEXP Y, SEXP PAR, SEXP N, SEXP K)
   double det = 0.0;
   double nrm = 0.0;
 
-/* HERE comes the code!!!
-   I start with returning a constant vector.
-   For checking if the declaration section gives any errors!
-*/
+/* HERE comes the computation of the log-density */
   for(i = 0; i < n; i++) {
 /* compute term2 the determinante */
     det = 0.0;
@@ -66,6 +65,9 @@ SEXP log_dmvncholC(SEXP Y, SEXP PAR, SEXP N, SEXP K)
     for(j = 0; j < k; j++) {
       Linvymuptr[j] = PARptr[i + n * (j + k)] * ymuptr[j];
       for(l = 0; l < j; l++) {
+	/* The l in the index subsetting of PARptr is wrong, but
+	   must be replaced to grep the right element of the lower
+	   triangular. */
         Linvymuptr[j] += PARptr[i + n * (l + k + k)] * ymuptr[l];
       }
     }
