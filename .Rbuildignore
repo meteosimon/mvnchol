@@ -3,6 +3,7 @@
 ^\\.git
 ^\\.gitignore
 ^README
+^TODO
 ^Makefile
 ^data
 R/datasets.R
