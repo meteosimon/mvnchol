@@ -25,7 +25,10 @@ SEXP log_dmvncholC(SEXP Y, SEXP PAR, SEXP N, SEXP K)
   int k = asInteger(K);
 
 /* loop counters */
-  int i, j, l;
+  int i, j, l, pos;
+
+/* integer vector for mapping a lower triangular matrix  */
+  int lowtri[k*k];
 
 /* residuals for single obs */
   SEXP ymu;
@@ -47,6 +50,19 @@ SEXP log_dmvncholC(SEXP Y, SEXP PAR, SEXP N, SEXP K)
   double det = 0.0;
   double nrm = 0.0;
 
+/* map lower triangular */
+  i = 0;
+  for(j = 0; j < k; j++) {
+    for(l = 0; l < k; l++) {
+      lowtri[l + j * k] = 0;
+      if(l > j) {
+	i += 1;
+	lowtri[l + j * k] = i;
+      }
+/*      printf(" i = %d, j = %d, l = %d, lowtri = %d \n", i, j, l, lowtri[l + j * k]); */
+    }
+  }
+
 /* HERE comes the computation of the log-density */
   for(i = 0; i < n; i++) {
 /* compute term2 the determinante */
@@ -65,10 +81,9 @@ SEXP log_dmvncholC(SEXP Y, SEXP PAR, SEXP N, SEXP K)
     for(j = 0; j < k; j++) {
       Linvymuptr[j] = PARptr[i + n * (j + k)] * ymuptr[j];
       for(l = 0; l < j; l++) {
-	/* The l in the index subsetting of PARptr is wrong, but
-	   must be replaced to grep the right element of the lower
-	   triangular. */
-        Linvymuptr[j] += PARptr[i + n * (l + k + k)] * ymuptr[l];
+	/* FIXME: Still something wrong with the mapping?? */
+	pos = k + k + lowtri[j + k * l] - 1;
+        Linvymuptr[j] += PARptr[i + n * pos] * ymuptr[l];
       }
     }
 
