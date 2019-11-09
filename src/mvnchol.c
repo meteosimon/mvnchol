@@ -11,11 +11,8 @@ Y observations (matrix)
 PAR parameters (matrix)
 N sample size (integer)
 K dimension of multivariate distribution
-MJ number of columns with location parameters
-DJ number of columns diagonal elements of L^{-1}
-TJ number of columns element in lower triangle of L^{-1}
 */
-SEXP log_dmvncholC(SEXP Y, SEXP PAR, SEXP N, SEXP K, SEXP MJ, SEXP DJ, SEXP TJ)
+SEXP log_dmvncholC(SEXP Y, SEXP PAR, SEXP N, SEXP K)
 {
 /* Pointers for obs and par */
   double *Yptr = REAL(Y);
@@ -24,22 +21,19 @@ SEXP log_dmvncholC(SEXP Y, SEXP PAR, SEXP N, SEXP K, SEXP MJ, SEXP DJ, SEXP TJ)
 /* integers from input */
   int n = asInteger(N);
   int k = asInteger(K);
-  int mj = asInteger(MJ);
-  int dj = asInteger(DJ);
-  int tj = asInteger(TJ);
 
 /* loop counters */
-  int i, j;
-
-/* inverse of L matrix for single obs */
-  SEXP Linv;
-  PROTECT(Linv = allocMatrix(REALSXP, k, k));
-  double *Linvptr = REAL(Linv);
+  int i, j, l;
 
 /* residuals for single obs */
   SEXP ymu;
   PROTECT(ymu = allocVector(REALSXP, k));
   double *ymuptr = REAL(ymu);
+
+/* inverse of L matrix times residuals for single obs */
+  SEXP Linvymu;
+  PROTECT(Linvymu = allocVector(REALSXP, k));
+  double *Linvymuptr = REAL(Linvymu);
 
 /* return value: vector of log-densities */
   SEXP d;
@@ -59,10 +53,31 @@ SEXP log_dmvncholC(SEXP Y, SEXP PAR, SEXP N, SEXP K, SEXP MJ, SEXP DJ, SEXP TJ)
 /* compute term2 the determinante */
     det = 0.0;
     for(j = 0; j < k; j++) {
-      det += PARptr[i + n * (j + mj)];
+      det += PARptr[i + n * (j + k)];
     }
 
-    dptr[i] = lpi + det;
+/* compute term3 the norm */
+    /* y - mu */
+    for(j = 0; j < k; j++) {
+      ymuptr[j] = Yptr[i + j * n] - PARptr[i + j * n];
+    }
+
+    /* inverse of L times vector of residuals */
+    for(j = 0; j < k; j++) {
+      Linvymuptr[j] = PARptr[i + n * (j + k)] * ymuptr[j];
+      for(l = 0; l < j; l++) {
+        Linvymuptr[j] += PARptr[i + n * (l + k + k)] * ymuptr[l];
+      }
+    }
+
+    /* L2-norm */
+    nrm = 0.0;
+    for(j = 0; j < k; j++) {
+      nrm += pow(Linvymuptr[j], 2.0);
+    }
+
+/* sum up terms of log likelihood */
+    dptr[i] = lpi + det - 0.5 * nrm;
   }
 
 /* return */

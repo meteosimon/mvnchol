@@ -102,12 +102,12 @@ log_dmvnchol_C <- function(y, par) {
   y <- as.matrix(y)
   n <- nrow(y)
   k <- ncol(y)
-  np <- names(par)
-  mj <- sum(grepl("mu", np))
-  dj <- sum(grepl("lamdiag", np))
-  tj <- sum(grepl("lambda", np))
+#  np <- names(par)
+#  mj <- sum(grepl("mu", np))
+#  dj <- sum(grepl("lamdiag", np))
+#  tj <- sum(grepl("lambda", np))
   par <- do.call("cbind", par)
-  .Call("log_dmvncholC", y, par, n, k, mj, dj, tj, PACKAGE = "bamlssMVN")
+  .Call("log_dmvncholC", y, par, n, k, PACKAGE = "bamlssMVN")
 }
 
 # choose `log_dmvnchol_ref` or `log_dmvnchol_C` for computing the log-density

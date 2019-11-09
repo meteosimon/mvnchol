@@ -4,10 +4,10 @@
 #include <R_ext/Rdynload.h>
 
 /* .Call calls */
-extern SEXP log_dmvncholC(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP log_dmvncholC(SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef callMethods[]  = {
-    {"log_dmvncholC", (DL_FUNC) &log_dmvncholC, 7},
+    {"log_dmvncholC", (DL_FUNC) &log_dmvncholC, 4},
     {NULL, NULL, 0}
 };
 
