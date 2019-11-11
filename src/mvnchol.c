@@ -68,7 +68,7 @@ SEXP log_dmvncholC(SEXP Y, SEXP PAR, SEXP N, SEXP K)
 /* compute term2 the determinante */
     det = 0.0;
     for(j = 0; j < k; j++) {
-      det += PARptr[i + n * (j + k)];
+      det += log(PARptr[i + n * (j + k)]);
     }
 
 /* compute term3 the norm */
@@ -81,7 +81,6 @@ SEXP log_dmvncholC(SEXP Y, SEXP PAR, SEXP N, SEXP K)
     for(j = 0; j < k; j++) {
       Linvymuptr[j] = PARptr[i + n * (j + k)] * ymuptr[j];
       for(l = 0; l < j; l++) {
-	/* FIXME: Still something wrong with the mapping?? */
 	pos = k + k + lowtri[j + k * l] - 1;
         Linvymuptr[j] += PARptr[i + n * pos] * ymuptr[l];
       }

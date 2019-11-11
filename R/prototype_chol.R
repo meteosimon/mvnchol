@@ -111,7 +111,7 @@ log_dmvnchol_C <- function(y, par) {
 }
 
 # choose `log_dmvnchol_ref` or `log_dmvnchol_C` for computing the log-density
-log_dmvnchol <- log_dmvnchol_ref
+log_dmvnchol <- log_dmvnchol_C
 
 # #' @param j dimension of parameter
 mu_score_mvnchol <- function(y, par, j) {
