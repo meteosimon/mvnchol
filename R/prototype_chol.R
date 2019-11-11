@@ -102,10 +102,6 @@ log_dmvnchol_C <- function(y, par) {
   y <- as.matrix(y)
   n <- nrow(y)
   k <- ncol(y)
-#  np <- names(par)
-#  mj <- sum(grepl("mu", np))
-#  dj <- sum(grepl("lamdiag", np))
-#  tj <- sum(grepl("lambda", np))
   par <- do.call("cbind", par)
   .Call("log_dmvncholC", y, par, n, k, PACKAGE = "bamlssMVN")
 }
@@ -114,7 +110,7 @@ log_dmvnchol_C <- function(y, par) {
 log_dmvnchol <- log_dmvnchol_C
 
 # #' @param j dimension of parameter
-mu_score_mvnchol <- function(y, par, j) {
+mu_score_mvnchol_ref <- function(y, par, j) {
   n <- nrow(y) # number of observations
   k <- ncol(y) # dimension of gaussian distribution
   mu <- paste0("mu", seq_len(k))
@@ -140,6 +136,19 @@ mu_score_mvnchol <- function(y, par, j) {
   }
   return(dl_dmu)
 }      	
+
+mu_score_mvnchol_C <- function(y, par, j) {
+  y <- as.matrix(y)
+  n <- nrow(y)
+  k <- ncol(y)
+  par <- do.call("cbind", par)
+  j <- as.integer(j)
+  .Call("mu_score_mvncholC", y, par, n, k, j, PACKAGE = "bamlssMVN")
+}
+
+# choose `mu_score_mvnchol_ref` or `mu_score_mvnchol_C` for computing mu-scores
+mu_score_mvnchol <- mu_score_mvnchol_C
+
 
 lamdiag_score_mvnchol <- function(y, par, j) {
   n <- nrow(y) # number of observations
