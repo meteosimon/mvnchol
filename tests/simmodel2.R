@@ -116,7 +116,7 @@ f <- list(y0 ~ s(x0), y1 ~ s(x0), y2 ~ s(x0),
 	  lamdiag1 ~ s(x0), lamdiag2 ~ s(x0), lamdiag3 ~ s(x0),
 	  lambda12 ~ s(x0), lambda13 ~ s(x0), lambda23 ~ s(x0))
 
-b <- bamlss(f, family = mvn_chol(k = 3), data = d, sampler = FALSE, optimizer = bfit, eps = 0.001)
+b <- bamlss(f, family = mvn_chol(k = 3), data = d, sampler = FALSE, optimizer = bfit)
 
 fit <- predict(b, type = "parameter")
 

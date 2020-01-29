@@ -139,6 +139,7 @@ mu_score_mvnchol_ref <- function(y, par, j) {
 
 mu_score_mvnchol_C <- function(y, par, j) {
   y <- as.matrix(y)
+  y <- matrix(as.numeric(y), ncol = ncol(y), nrow = nrow(y))
   n <- nrow(y)
   k <- ncol(y)
   par <- do.call("cbind", par)
@@ -180,6 +181,7 @@ lamdiag_score_mvnchol_ref <- function(y, par, j) {
 
 lamdiag_score_mvnchol_C <- function(y, par, j) {
   y <- as.matrix(y)
+  y <- matrix(as.numeric(y), ncol = ncol(y), nrow = nrow(y))
   n <- nrow(y)
   k <- ncol(y)
   par <- do.call("cbind", par)
@@ -223,6 +225,7 @@ lambda_score_mvnchol_ref <- function(y, par, i, j) {
 
 lambda_score_mvnchol_C <- function(y, par, i, j) {
   y <- as.matrix(y)
+  y <- matrix(as.numeric(y), ncol = ncol(y), nrow = nrow(y))
   n <- nrow(y)
   k <- ncol(y)
   par <- do.call("cbind", par)
