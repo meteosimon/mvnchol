@@ -7,4 +7,5 @@
 ^Makefile
 ^data
 R/datasets.R
+R/simulator.R
 

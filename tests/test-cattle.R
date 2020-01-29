@@ -4,7 +4,7 @@ library(bamlssMVN)
 
 # load and reshape cattle data
 data("cattle", package = "jmcm")
-df <- reshape(cattle, direction = "wide", timevar = "day", v.names = "weight")
+df <- reshape(cattle, direction = "wide", timevar = "day", v.names = "weight", sep = "_")
 rownames(df) <- df$id
 df$id <- NULL
 
@@ -19,22 +19,22 @@ df$id <- NULL
 
 
 
-f_mus <- paste0(paste0(names(df)[2:12], " ~ 0 + group"))
-f_lamdiags <- paste0(paste0("lamdiag", seq_len(11)), " ~ 0 + group")
+f_mus <- paste0(paste0(names(df)[2:12], " ~ 0 + s(group, bs = 're')"))
+f_lamdiags <- paste0(paste0("lamdiag", seq_len(11)), " ~ 0 + s(group, bs = 're')")
 f_lambdas <- paste0(combn(seq_len(11), 2, 
 			  function(x) paste0("lambda", x[1], x[2])), 
-		    " ~ 0 + group")
+		    " ~ 0 + s(group, bs = 're')")
 
 
 f <- lapply(c(f_mus, f_lamdiags, f_lambdas), FUN = as.formula)
 
 b <- bamlss(f, family = mvn_chol(k = 11), data = df, 
-	    sampler = FALSE, optimizer = bfit)
+	    sampler = FALSE, criterion = "BIC", optimizer = bfit)
 
 p <- predict(b, type = "parameter")
 
 matricize <- function(p) {
-  k <- length(grep("lamdiag", names(fit)))
+  k <- length(grep("lamdiag", names(p)))
   n <- length(p[[1]])
 
   Linvt <- list()
@@ -76,6 +76,12 @@ matricize <- function(p) {
   return(list("L" = Linvt, "D" = D, "T" = Tinvt, "precision" = Siginv, 
 	      "covariance" = Sigma, "correlation" = Omega))
 }
+
+
+## Helper function to extract offdiagonals of matrix as vector
+offdiag <- function(x, k = 0) {x[which((col(x) - row(x)) == k)]}
+
+## Plot log()
 
 
 

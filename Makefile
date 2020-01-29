@@ -1,3 +1,5 @@
+all: doc install check site
+
 site:
 	Rscript -e 'pkgdown::build_site()'
 

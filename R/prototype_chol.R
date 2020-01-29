@@ -100,6 +100,7 @@ log_dmvnchol_ref <- function(y, par) {
 
 log_dmvnchol_C <- function(y, par) {
   y <- as.matrix(y)
+  y <- matrix(as.numeric(y), ncol = ncol(y), nrow = nrow(y))
   n <- nrow(y)
   k <- ncol(y)
   par <- do.call("cbind", par)
