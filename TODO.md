@@ -7,7 +7,5 @@ TODO
 
 * CI of tests in gitlab.
 
-* Transfer score functions to C.
-
 
 
