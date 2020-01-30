@@ -16,10 +16,19 @@ f_lambdas <- paste0(combn(seq_len(11), 2,
 		    " ~ 0 + s(group, bs = 're')")
 
 
+f_mus <- paste0(paste0(names(df)[2:12], " ~ 0 + group"))
+f_lamdiags <- paste0(paste0("lamdiag", seq_len(11)), " ~ 0 + group")
+f_lambdas <- paste0(combn(seq_len(11), 2, 
+			  function(x) paste0("lambda", x[1], x[2])), 
+		    " ~ 0 + group")
+
+
 f <- lapply(c(f_mus, f_lamdiags, f_lambdas), FUN = as.formula)
 
 b <- bamlss(f, family = mvn_chol(k = 11), data = df, 
-	    sampler = FALSE, criterion = "BIC", optimizer = bfit)
+	    sampler = TRUE, criterion = "BIC", optimizer = bfit, 
+	    burnin = 1000, thin = 5, n.iter = 2000)
+saveRDS(b, file = "cattle_model_mcmc_burn1000_thin5.RDS")
 
 p <- predict(b, type = "parameter")
 
