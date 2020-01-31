@@ -150,12 +150,30 @@ cov_un <- p95_matrices$covariance[[2]]
 prec_reg <- p2_matrices$precision[[1]]
 prec_un <- p95_matrices$precision[[2]]
 
-x11()
-par(mfrow = c(2, 2))
-# image(cor_un[, nrow(cor_un):1])
-# image(cor_reg[, nrow(cor_reg):1])
-image(cov_un[, nrow(cov_un):1], xaxt = 'n', yaxt = 'n')
-image(cov_reg[, nrow(cov_reg):1], xaxt ='n', yaxt = 'n')
-image(prec_un[, nrow(prec_un):1], xaxt = 'n', yaxt = 'n')
-image(prec_reg[, nrow(prec_reg):1], xaxt = 'n', yaxt = 'n')
+# make values close to 0 NA so that they appear white in image plot
+prec_reg[abs(prec_reg) < .00001] <- NA
+prec_un[abs(prec_un) < .00001] <- NA
 
+
+coolwarm_hcl <- colorspace::diverging_hcl(11,
+  h = c(250, 10), c = 100, l = c(37, 88), power = c(0.7, 1.7))
+
+brbg_hcl <- colorspace::diverging_hcl(101, h = c(180, 50), c = 80, 
+				      l = c(20, 95), power = c(0.7, 1.3))
+
+mx <- max(abs(c(prec_reg, prec_un)))
+brks <- seq(-mx, mx, length.out = 12)
+
+
+x11()
+par(mfrow = c(2, 2), mar = c(2,2,3,2))
+image(cov_un[, nrow(cov_un):1], xaxt = 'n', yaxt = 'n', 
+      main = TeX('$\\Sigma$'), zlim = range(c(cov_reg, cov_un)))
+image(cov_reg[, nrow(cov_reg):1], xaxt ='n', yaxt = 'n',
+      main = TeX('$\\Sigma_{reg}$'), zlim = range(c(cov_reg, cov_un)))
+image(prec_un[, nrow(prec_un):1], xaxt = 'n', yaxt = 'n',
+      main = TeX('$\\Sigma^{-1}$'), zlim = c(-mx, mx), 
+      col = coolwarm_hcl, breaks = brks)
+image(prec_reg[, nrow(prec_reg):1], xaxt = 'n', yaxt = 'n',
+      main = TeX('$\\Sigma^{-1}_{reg}$'), zlim = c(-mx, mx),
+      col = coolwarm_hcl, breaks = brks)

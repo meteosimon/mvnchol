@@ -62,6 +62,31 @@ mvn_chol <- function(k = 2L, ...) {
   }
   rval$score <- scores
 
+  # --- add precision matrix function ---
+  rval$precision <- function(par) {
+
+    k <- length(grep("lamdiag", names(par)))
+    n <- length(par[[1]])
+
+    Linvt <- list()
+    Siginv <- list()
+
+    for (i in 1:n) {
+      Linvt[[i]] <- matrix(0, nrow = k, ncol = k)
+      for (j in 1:k) {
+        Linvt[[i]][j, j] <- p[[paste0("lamdiag", j)]][i]
+        if (j < k) {
+          for (l in (j+1):k) {
+            Linvt[[i]][j, l] <- p[[paste0("lambda", j, l)]][i]
+          }
+        }
+      }
+    Siginv[[i]] <- Linvt[[i]] %*% t(Linvt[[i]])
+    }
+
+    return(Siginv)
+  }
+
   # --- set class and return ---
   class(rval) <- "family.bamlss"
   rval
