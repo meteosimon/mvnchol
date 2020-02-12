@@ -1,6 +1,8 @@
 library(jmcm)            # for cattle data
 library(bamlss)
 library(bamlssMVN)
+library(latex2exp)
+library(fields)
 
 # load and reshape cattle data
 data("cattle", package = "jmcm")
@@ -52,6 +54,58 @@ matricize <- function(p) {
               "covariance" = Sigma, "correlation" = Omega))
 }
 
+## Adjust jmcm regressogram function to allow for different mfrow
+regressogram2 <- function(object, time, op2){
+    debug <- 0
+    op <- op2
+    opt <- object@opt
+    lambda <- opt$lambda
+    gamma <- opt$gamma
+    llmd <- length(lambda)
+    lgma <- length(gamma)
+    args <- object@args
+    dims <- object@devcomp$dims
+    m <- args[["m"]]
+    Y <- args[["Y"]]
+    X <- args[["X"]]
+    Z <- args[["Z"]]
+    W <- args[["W"]]
+    if (length(unique(m)) != 1)
+        stop("No regressograms. Unbalanced longitudinal dataset.")
+    DataMat <- t(Y[1:m[1]])
+    for (i in 2:length(m)) {
+        DataMat <- rbind(DataMat, t(Y[(sum(m[1:(i - 1)]) + 1):sum(m[1:i])]))
+    }
+    dimnames(DataMat) <- NULL
+    S <- cov(DataMat)
+    R <- cor(DataMat)
+    C <- t(chol(S))
+    D <- diag(diag(C))
+    Tt <- t(forwardsolve(C %*% diag(diag(C)^(-1)), diag(dim(D)[1])))
+    Lt <- t(diag(diag(C)^(-1)) %*% C)
+    ts <- seq(min(time), max(time), length.out = 100)
+    tlag <- 1
+    for (i in 2:10) {tlag <- c(tlag, i:1)}
+    tslag <- seq(min(tlag), max(tlag), length.out = 100)
+    Z.ts <- NULL
+    W.tslag <- NULL
+    for (i in 0:(llmd - 1)) Z.ts <- cbind(Z.ts, ts^i)
+    for (i in 0:(lgma - 1)) W.tslag <- cbind(W.tslag, tslag^i)
+    Zlmd <- Z.ts %*% lambda
+    Wgma <- W.tslag %*% gamma
+    if (dims["MCD"] == 1) {
+        plot(time, log(diag(D)^2), xlab = "", ylab = "Log-innovat. var.", 
+	     pch = 19, ylim = c(1.5, 5))
+        lines(ts, Zlmd)
+        phi <- -Tt[upper.tri(Tt, diag = FALSE)]
+        plot(tlag, phi, xlab = "", ylab = "Autoregres. coeffic.", 
+	     pch = 19, ylim = c(-.7, 2))
+        lines(tslag, Wgma)
+    }
+}
+
+
+
 
 ## Helper function to extract offdiagonals of matrix as vector
 offdiag <- function(x, k = 0) {x[which((col(x) - row(x)) == k)]}
@@ -89,10 +143,16 @@ for (i in 1:10) {
 xx <- matrix(1:10, ncol = 10, nrow = 10, byrow = TRUE)
 
 
+cattleA <- subset(cattle, group == "A")
+fit1 <- jmcm(weight | id | I(day / 14 + 1) ~ 1 | 1, data = cattleA, 
+	     triple = c(8, 3, 4), cov.method = "mcd")
+
 x11()
-par(mfrow = c(2, 2))
-plot(loginnovars1, xlab = "Time", ylab = "Log-innovat. var.")
-plot(xx, genautoregs1, xlab = "Lag", ylab = "Autoregres. coeffic.")
+#par(mfrow = c(2, 2))
+regressogram2(fit1, time = 1:11, par(mfrow = c(3,2), 
+				     mar = c(4,4,2,2)))
+plot(loginnovars1, xlab = "", ylab = "Log-innovat. var.")
+plot(xx, genautoregs1, xlab = "", ylab = "Autoregres. coeffic.")
 plot(loginnovars2, xlab = "Time", ylab = "Log-innovat. var.")
 plot(xx, genautoregs2, xlab = "Lag", ylab = "Autoregres. coeffic.")
 
@@ -124,13 +184,14 @@ for (i in 1:10) {
 }
 
 
-x11()
-par(mfrow = c(2, 2))
-plot(loginnovars500, xlab = "Time", ylab = "Log-innovat. var.", pch = 19, 
+pdf("/home/thomas/Documents/Projects/PhD-Concept/figures/cattle_comp.pdf")
+regressogram2(fit1, time = 1:11, par(mfrow = c(3,2),
+                                     mar = c(4,4,0.5,2)))
+plot(loginnovars500, xlab = "", ylab = "Log-innovqt. var.", pch = 19, 
      ylim = c(1.5, 5))
 arrows(x0 = 1:11, y0 = loginnovars025, x1 = 1:11, y1 = loginnovars975, 
        length = .05, angle = 90, code = 3)
-plot(xx, genautoregs500, xlab = "Lag", ylab = "Autoregres. coeffic.", 
+plot(xx, genautoregs500, xlab = "", ylab = "Autoregres. coeffic.", 
      ylim = c(-0.7, 2), pch = 19)
 arrows(x0 = xx, y0 = genautoregs025, x1 = xx, y1 = genautoregs975,
        length = .05, angle = 90, code = 3)
@@ -140,7 +201,7 @@ plot(loginnovars2, xlab = "Time", ylab = "Log-innovat. var.",
 plot(xx, genautoregs2, xlab = "Lag", ylab = "Autoregres. coeffic.", 
      ylim = c(-0.7, 2), pch = 19)
 abline(h = 0, lty = 2)
-
+dev.off()
 
 ## Compare regularized and unregularized covariance and precision matrix
 cor_reg <- p2_matrices$correlation[[1]]
@@ -161,19 +222,32 @@ coolwarm_hcl <- colorspace::diverging_hcl(11,
 brbg_hcl <- colorspace::diverging_hcl(101, h = c(180, 50), c = 80, 
 				      l = c(20, 95), power = c(0.7, 1.3))
 
-mx <- max(abs(c(prec_reg, prec_un)))
+ylrd <- hcl.colors(10, "YlOrRd", rev = TRUE)
+
+mx <- .33
 brks <- seq(-mx, mx, length.out = 12)
 
-
-x11()
-par(mfrow = c(2, 2), mar = c(2,2,3,2))
+pdf("/home/thomas/Documents/Projects/PhD-Concept/figures/cattle_sparse.pdf", 
+    width = 7, height = 7)
+par(mfrow = c(2, 2), mar = c(2,1,3,1.7), oma = c(0,0,0,4))
 image(cov_un[, nrow(cov_un):1], xaxt = 'n', yaxt = 'n', 
-      main = TeX('$\\Sigma$'), zlim = range(c(cov_reg, cov_un)))
+      main = TeX('$\\Sigma$'), zlim = c(0, 500), 
+      col = ylrd, asp = 1)
 image(cov_reg[, nrow(cov_reg):1], xaxt ='n', yaxt = 'n',
-      main = TeX('$\\Sigma_{reg}$'), zlim = range(c(cov_reg, cov_un)))
+      main = TeX('$\\Sigma_{reg}$'), zlim = c(0, 500), 
+      col = ylrd, asp = 1)
+image.plot(cov_reg, zlim = c(0, 500), 
+           legend.only = TRUE, col = hcl.colors(10, "YlOrRd", rev = TRUE), 
+	   smallplot= c(.95,1,.1,.85), breaks = 50*(0:10), 
+	   axis.args = list(at = 50*(0:10)))
 image(prec_un[, nrow(prec_un):1], xaxt = 'n', yaxt = 'n',
       main = TeX('$\\Sigma^{-1}$'), zlim = c(-mx, mx), 
-      col = coolwarm_hcl, breaks = brks)
+      col = coolwarm_hcl, breaks = brks, asp = 1)
 image(prec_reg[, nrow(prec_reg):1], xaxt = 'n', yaxt = 'n',
       main = TeX('$\\Sigma^{-1}_{reg}$'), zlim = c(-mx, mx),
-      col = coolwarm_hcl, breaks = brks)
+      col = coolwarm_hcl, breaks = brks, asp = 1)
+image.plot(zlim = c(-mx, mx), 
+           legend.only = TRUE, col = coolwarm_hcl,
+           breaks = brks, at = brks, axis.args = list(at = brks),
+	   smallplot= c(.95,1,.1,.85))
+dev.off()

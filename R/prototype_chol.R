@@ -74,10 +74,10 @@ mvn_chol <- function(k = 2L, ...) {
     for (i in 1:n) {
       Linvt[[i]] <- matrix(0, nrow = k, ncol = k)
       for (j in 1:k) {
-        Linvt[[i]][j, j] <- p[[paste0("lamdiag", j)]][i]
+        Linvt[[i]][j, j] <- par[[paste0("lamdiag", j)]][i]
         if (j < k) {
           for (l in (j+1):k) {
-            Linvt[[i]][j, l] <- p[[paste0("lambda", j, l)]][i]
+            Linvt[[i]][j, l] <- par[[paste0("lambda", j, l)]][i]
           }
         }
       }
@@ -86,6 +86,63 @@ mvn_chol <- function(k = 2L, ...) {
 
     return(Siginv)
   }
+
+  # --- add covariance matrix function ---
+  rval$covariance <- function(par) {
+
+    k <- length(grep("lamdiag", names(par)))
+    n <- length(par[[1]])
+
+    Linvt <- list()
+    Sig <- list()
+
+    for (i in 1:n) {
+      Linvt[[i]] <- matrix(0, nrow = k, ncol = k)
+      for (j in 1:k) {
+        Linvt[[i]][j, j] <- par[[paste0("lamdiag", j)]][i]
+        if (j < k) {
+          for (l in (j+1):k) {
+            Linvt[[i]][j, l] <- par[[paste0("lambda", j, l)]][i]
+          }
+        }
+      }
+    L <- solve(Linvt[[i]])
+    Sig[[i]] <- t(L) %*% L
+    }
+
+    return(Sig)
+  }
+
+  # --- add correlation matrix function ---
+  rval$correlation <- function(par) {
+
+    k <- length(grep("lamdiag", names(par)))
+    n <- length(par[[1]])
+
+    Linvt <- list()
+    Cor <- list()
+
+    for (i in 1:n) {
+      Linvt[[i]] <- matrix(0, nrow = k, ncol = k)
+      for (j in 1:k) {
+        Linvt[[i]][j, j] <- par[[paste0("lamdiag", j)]][i]
+        if (j < k) {
+          for (l in (j+1):k) {
+            Linvt[[i]][j, l] <- par[[paste0("lambda", j, l)]][i]
+          }
+        }
+      }
+    L <- solve(Linvt[[i]])
+    Sig <- t(L) %*% L
+    inv_sds <- matrix(0, nrow = k, ncol = k)
+    diag(inv_sds) <- 1 / sqrt(diag(Sig))
+    Cor[[i]] <- inv_sds %*% Sig %*% inv_sds 
+    }
+
+    return(Cor)
+  }
+
+
 
   # --- set class and return ---
   class(rval) <- "family.bamlss"
