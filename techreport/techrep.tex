@@ -220,7 +220,7 @@ and
 
 
 \newpage
-\section{Cholesky Parametrisation}
+\section{Cholesky Parameterization}
 
 Any symmetric positive definite matrix can be decomposed as the product of a
 lower triangular matrix $L$ and its transpose $L^\top$. In this manner 
@@ -230,6 +230,7 @@ we can write the covariance matrix $\Sigma$ as
  \Sigma = L L^\top
  \qquad \text{,} \qquad
  \Sigma^{-1} = (L^{-1})^\top L^{-1}.
+ \label{eq:basic_chol}
 \end{equation}
 %
 Equation \ref{eq:ll1} for the log-likelihood can be rewritten in terms of $L$ as 
@@ -335,6 +336,7 @@ For the case where $m \neq n$,
   -\frac{1}{2} \sum_{j=1}^k \left[2 \left(\sum_{i=1}^j (\tilde{y}_i \lambda_{ij}) 
 	\right) \tilde{y}_m \mathbbm{1}_n(j) \right] = 
   - \tilde{y}_m \sum_{i = 1}^{n} \left( \tilde{y}_i \lambda_{in} \right).	
+ \label{eq:cholscore_ij}
 \end{equation}
 %
 If $m = n$, the second term in the log-likelihood also has nonzero partial 
@@ -344,6 +346,7 @@ derivative with respect to $\lambda_{mn}$ and
   \frac{\partial l}{\partial \lambda_{mm}} = 
 	\frac{1}{\lambda_{mm}}- \tilde{y}_m \sum_{i = 1}^{m} 
 	\left( \tilde{y}_i \lambda_{im} \right).	
+  \label{eq:cholscore_ii}
 \end{equation}.
 
 Since all entries on the main diagonal of $L^{-1}$ must be positive 
@@ -379,5 +382,158 @@ $\mu_i = \eta_{\mu,i}$, also suffices and Eq. \ref{eq:mu_chol} becomes
 where $\varsigma_{ij}$ refers to the corresponding element of 
 $\Sigma^{-1} = (L^{-1})^\top L^{-1}$.
 
-\end{document}
+\newpage
+\section{Modified Cholesky Parameterization}
 
+In the modified Cholesky decomposition, the covariance matrix $\Sigma$ is 
+represented as
+%
+\begin{equation}
+ T \Sigma T^\top = D
+ \qquad \text{,} \qquad
+	\Sigma^{-1} = T^\top D^{-1} T,
+\end{equation}
+%
+where $T$ is a unit lower triangular matrix and $D$ is a diagonal matrix with 
+positive entries. $T$ and $D$ contain the negative generalized autoregresive coefficients 
+$\phi_{ij}$ and innovation variances $\psi_i = \varsigma_i^2$, respectively:
+%
+\begin{equation}
+	T^\top=
+  \begin{pmatrix}
+    1 & -\phi_{12} & -\phi_{13} & \cdots & -\phi_{1k} \\
+    0 & 1 & -\phi_{23} & \cdots & -\phi_{2k} \\
+    0 & 0 & 1 & \cdots & -\phi_{3k} \\
+    \vdots & \vdots & \vdots & \ddots & \vdots \\
+    0 & 0 & 0 & \cdots & 1
+  \end{pmatrix}
+	\qquad \text{,} \qquad
+	D =
+  \begin{pmatrix}
+    \psi_1 & 0 & 0 & \cdots & 0 \\
+    0 & \psi_2 & 0 & \cdots & 0 \\
+    0 & 0 & 1 & \cdots & 0 \\
+    \vdots & \vdots & \vdots & \ddots & \vdots \\
+    0 & 0 & 0 & \cdots & \psi_k
+  \end{pmatrix}.
+\end{equation}
+%
+We can relate the entries of $T$ and $D$ to those of $L^{-1}$ in the basic Cholesky 
+decomposition (see Eq.\ \ref{eq:basic_chol}) by 
+%
+\begin{equation}
+  L^{-1} = D^{-1/2} T \qquad \text{which implies} \qquad
+	\lambda_{ii} = \psi_i^{-1/2} \quad \text{,} \quad
+        \lambda_{ij} = -\phi_{ij} \cdot \psi_j^{-1/2}.
+  \label{eq:relate_basic_mod}
+\end{equation}
+%
+We can rewrite the log-likelihood in Equation \ref{eq:ll_chol_terms} 
+with respect to the new parameters (for notational simplicity we 
+take $\phi_{ii} = -1$):
+%
+\begin{equation}
+	l(\mu, \psi, \phi | y) = -\frac{k}{2}\log(2\pi) - \frac{1}{2} \sum_{i=1}^k 
+	\log{\psi_i} - \frac{1}{2} \sum_{j=1}^k 
+	\left( \sum_{i=1}^j \left( \tilde{y}_i \phi_{ij} \psi_j^{-1/2} 
+	\right) \right)^2.
+ \label{eq:ll_mod_chol}
+\end{equation}
+%
+
+\hfill \\
+Given that we have the partial derivatives of the log-likelihood with respect to 
+$\mu$, $\lambda_{ij}$ and $\lambda_{ii}$ (Eqs.\ \ref{eq:mu_chol}, 
+\ref{eq:cholscore_ij}, \ref{eq:cholscore_ii}) we can immediately write 
+%
+\begin{equation}
+	\frac{\partial l}{\partial \mu} = T^\top D^{-1} T \tilde{y},
+ \label{eq:mu_modchol}
+\end{equation}
+%
+but also
+%
+\begin{equation}
+	\frac{\partial l}{\partial \phi_{mn}} = \frac{\partial l}{\partial \lambda_{mn}} 
+	\cdot \frac{\partial \lambda_{mn}}{\partial \phi_{mn}}
+\end{equation}
+%
+and
+%
+\begin{equation}
+	\frac{\partial l}{\partial \psi_{n}} = \frac{\partial l}{\partial \lambda_{nn}} 
+	\cdot \frac{\partial \lambda_{nn}}{\partial \psi_{n}} + 
+	\sum_{m=1}^{n-1} \left(  \frac{\partial l}{\partial \lambda_{mn}} 
+	\cdot \frac{\partial \lambda_{mn}}{\partial \psi_{n}} \right).
+\end{equation}
+%
+From Equation \ref{eq:relate_basic_mod} we can calculate the partial derivatives 
+%
+\begin{equation}
+	\frac{\partial \lambda_{mn}}{\partial \phi_{mn}} = - \psi_n^{-1/2} 
+\end{equation}
+%
+and
+%
+\begin{equation}
+	\frac{\partial \lambda_{nn}}{\partial \psi_{n}} = -\frac{1}{2} \psi_n^{-3/2}
+	\qquad \text{,} \qquad
+	\frac{\partial \lambda_{mn}}{\partial \psi_{n}} = \frac{1}{2} \phi_{mn} \psi_n^{-3/2}.	
+\end{equation}
+%
+
+Having already calculated the partial derivatives of $l$ with respect to $\lambda_{nn}$ 
+and $\lambda_{mn}$ in the basic Cholesky parameterization, we can substitute 
+to obtain
+%
+\begin{equation}
+	\frac{\partial l}{\partial \phi_{mn}} = - \tilde{y}_m \psi_n^{-1} 
+	\sum_{i=1}^n \tilde{y_i} \phi_{in} 
+\end{equation}
+%
+and
+%
+\begin{equation}
+	\frac{\partial l}{\partial \psi_{n}} =
+        -\frac{1}{2} \left[ \frac{1}{\psi_n} + \tilde{y}_n \sum_{i=1}^n \left(
+	  \tilde{y}_i \phi_{in} \psi_n^{-2} \right) \right] + 
+	\frac{1}{2} \psi_n^{-2} \sum_{m=1}^{n-1} \left[ \tilde{y}_m \phi_{mn} 
+	  \left( \sum_{i=1}^n \tilde{y}_i \phi_{in} \right) \right]
+\end{equation}
+%
+which simplifies to
+%
+\begin{equation}
+  \frac{\partial l}{\partial \psi_{n}} = \frac{1}{2} \psi_n^{-2} 
+    \left[ \left( \sum_{i = 1}^n \tilde{y}_i \phi_{in} \right) ^2 - \psi_n \right].
+\end{equation}
+%
+Since the $\psi_n$ are estimated with a log-link ($\log(\psi_n) = \eta_{\psi,n}$), 
+we are actually interested in 
+%
+\begin{equation}	   
+  \frac{\partial l}{\partial \eta_{\psi,n}} =
+	\frac{\partial l}{\partial \psi_{n}} \psi_{n} 
+	 =   \frac{1}{2} 
+	\left[ \frac{1}{\psi_n} \left( \sum_{i = 1}^n \tilde{y}_i \phi_{in} \right) ^2 - 1 \right].
+\end{equation}
+For the other parameters we use the identity link, so $\eta_{\phi,mn} = \phi_{mn}$ 
+and $\eta_{\mu,m} = \mu_{m}$. 
+\hfill \\
+
+Continuing with the partial second derivatives, we see that
+%
+\begin{equation}	   
+	\frac{\partial^2 l}{\partial \eta_{\phi,mn}^2} = - \tilde{y}_m^2/ \psi_n 
+	\qquad \text{,} \qquad 
+	\frac{\partial^2 l}{\partial \eta_{\psi,n}^2} = -\frac{1}{2 \psi_n} 
+		\left( \sum_{i = 1}^n \tilde{y}_i \phi_{in} \right) ^2
+	\qquad \text{and} \qquad 
+	\frac{\partial^2 l}{\partial \eta_{\mu,n}^2} = - \zeta_{nn}, 
+\end{equation}
+%
+where $\zeta_{nn}$ is the $n$-th diagonal entry of $\Sigma^{-1}$.  
+%
+
+
+\end{document}
