@@ -7,6 +7,9 @@ techreport/*.aux
 techreport/*.log
 techreport/*.out
 
+# datasets
+tests/*.RDS
+
 # compiled code and shared objects
 src/*.so
 src/*.o

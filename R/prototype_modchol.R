@@ -62,11 +62,37 @@ mvn_modchol <- function(k = 2L, ...) {
   }
   rval$score <- scores
 
+  # --- add hess funcitons ---
+  mu_hess_calls <- paste0(
+    "function(y, par, ...) {mu_hess_mvnmodchol(y, par, j = ", seq_len(k),")}"
+  )
+  innov_hess_calls <- paste0(
+    "function(y, par, ...) {innov_hess_mvnmodchol(y, par, j = ", seq_len(k),")}"
+  )
+  phi_hess_calls <- utils::combn(seq_len(k), 2, function(x) {paste0(
+    "function(y, par, ...) {phi_hess_mvnmodchol(y, par, i = ", x[1],", j = ", x[2],")}"
+  )})
+
+  hesses <- list()
+  for(j in seq_along(mu)) {
+    hesses[[mu[j]]] <- eval(parse(text = mu_hess_calls[j]))
+  }
+  for(j in seq_along(innov)) {
+    hesses[[innov[j]]] <- eval(parse(text = innov_hess_calls[j]))
+  }
+  for(j in seq_along(phi)) {
+    hesses[[phi[j]]] <- eval(parse(text = phi_hess_calls[j]))
+  }
+  rval$hess <- hesses
+
 
   # --- set class and return ---
   class(rval) <- "family.bamlss"
   rval
 }
+
+
+## LOG-LIKELIHOOD
 
 # #' @param y amatrix n x k.
 # #' @param par a list with k+k+k(k-1)/2 elements named like the parameters of the family,
@@ -106,11 +132,14 @@ log_dmvnmodchol_C <- function(y, par) {
   n <- nrow(y)
   k <- ncol(y)
   par <- do.call("cbind", par)
-  .Call("log_dmvncholC", y, par, n, k, PACKAGE = "bamlssMVN")
+  .Call("log_dmvnmodcholC", y, par, n, k, PACKAGE = "bamlssMVN")
 }
 
 # choose `log_dmvnchol_ref` or `log_dmvnchol_C` for computing the log-density
-log_dmvnmodchol <- log_dmvnmodchol_ref
+log_dmvnmodchol <- log_dmvnmodchol_C
+
+
+## BEGIN WITH SCORES
 
 # #' @param j dimension of parameter
 mu_score_mvnmodchol_ref <- function(y, par, j) {
@@ -148,11 +177,11 @@ mu_score_mvnmodchol_C <- function(y, par, j) {
   k <- ncol(y)
   par <- do.call("cbind", par)
   j <- as.integer(j)
-  .Call("mu_score_mvncholC", y, par, n, k, j, PACKAGE = "bamlssMVN")
+  .Call("mu_score_mvnmodcholC", y, par, n, k, j, PACKAGE = "bamlssMVN")
 }
 
 # choose `mu_score_mvnchol_ref` or `mu_score_mvnchol_C` for computing mu-scores
-mu_score_mvnmodchol <- mu_score_mvnmodchol_ref
+mu_score_mvnmodchol <- mu_score_mvnmodchol_C
 
 
 innov_score_mvnmodchol_ref <- function(y, par, j) {
@@ -193,7 +222,7 @@ innov_score_mvnmodchol_C <- function(y, par, j) {
 }
 
 # choose `mu_score_mvnchol_ref` or `mu_score_mvnchol_C` for computing mu-scores
-innov_score_mvnmodchol <- innov_score_mvnmodchol_ref
+innov_score_mvnmodchol <- innov_score_mvnmodchol_C
 
 
 
@@ -225,9 +254,99 @@ phi_score_mvnmodchol_ref <- function(y, par, i, j) {
 
 }
 
-# choose `mu_score_mvnchol_ref` or `mu_score_mvnchol_C` for computing mu-scores
-phi_score_mvnmodchol <- phi_score_mvnmodchol_ref
+phi_score_mvnmodchol_C <- function(y, par, i, j) {
+  y <- as.matrix(y)
+  storage.mode(y) <- "numeric"
+  n <- nrow(y)
+  k <- ncol(y)
+  par <- do.call("cbind", par)
+  i <- as.integer(i)
+  j <- as.integer(j)
+  .Call("phi_score_mvnmodcholC", y, par, n, k, i, j, PACKAGE = "bamlssMVN")
+}
 
+# choose `mu_score_mvnchol_ref` or `mu_score_mvnchol_C` for computing mu-scores
+phi_score_mvnmodchol <- phi_score_mvnmodchol_C
+
+
+## BEGIN WITH HESSIAN
+
+mu_hess_mvnmodchol_ref <- function(y, par, j) {
+  n <- nrow(y) # number of observations
+  k <- ncol(y) # dimension of gaussian distribution
+  mu <- paste0("mu", seq_len(k))
+  innov <- paste0("innov", seq_len(k))
+  phi <- utils::combn(seq_len(k), 2, function(x) paste0("phi", x[1], x[2]))
+  par_full <- do.call("cbind", par)
+  dl_dmu <- vector(length = n)
+  for (ni in 1:n) {
+    dl_dmu[ni] <- 1 / par[[paste0("innov", j)]][ni]
+    if (j < k) {
+      for (jj in (j + 1):k) {
+        dl_dmu[ni] <- dl_dmu[ni] + par[[paste0("phi", j, jj)]][ni] ^ 2 / 
+		par[[paste0("innov", jj)]][ni]
+      }
+    } 
+  }
+  return(dl_dmu)
+}      	
+
+# choose `mu_score_mvnchol_ref` or `mu_score_mvnchol_C` for computing mu-scores
+mu_hess_mvnmodchol <- mu_hess_mvnmodchol_ref
+
+
+
+innov_hess_mvnmodchol_ref <- function(y, par, j) {
+  n <- nrow(y) # number of observations
+  k <- ncol(y) # dimension of gaussian distribution
+  mu <- paste0("mu", seq_len(k))
+  innov <- paste0("innov", seq_len(k))
+  phi <- utils::combn(seq_len(k), 2, function(x) paste0("phi", x[1], x[2]))
+  par_full <- do.call("cbind", par)
+  y_til <- as.matrix(y - subset(par_full, select = mu))
+  dl_dinnov <- vector(length = n)
+  for (ni in 1:n) {
+    y_tild <- y_til[ni, ]
+    Phimat <- matrix(0, nrow = k, ncol = k) # initialise -T matrix
+    diag(Phimat) <- -1
+    temp <- utils::combn(k, 2)
+    for (l in 1:length(phi)) { # assign off diagonal values
+      ii <- temp[1, l]
+      jj <- temp[2, l]
+      Phimat[jj, ii] <- par[[paste0("phi", ii, jj)]][ni]
+    }
+
+    dl_dinnov[ni] <- 0.5 / par[[paste0("innov", j)]][ni] * 
+	               sum(y_tild[1:j] * Phimat[j, 1:j]) ^ 2
+  }
+  return(dl_dinnov)
+}
+
+# choose `mu_score_mvnchol_ref` or `mu_score_mvnchol_C` for computing mu-scores
+innov_hess_mvnmodchol <- innov_hess_mvnmodchol_ref
+
+
+
+
+
+# #' @param i dimension of parameter
+phi_hess_mvnmodchol_ref <- function(y, par, i, j) {
+  n <- nrow(y) # number of observations
+  k <- ncol(y) # dimension of gaussian distribution
+  mu <- paste0("mu", seq_len(k))
+  innov <- paste0("innov", seq_len(k))
+  phi <- utils::combn(seq_len(k), 2, function(x) paste0("phi", x[1], x[2]))
+  par_full <- do.call("cbind", par)
+  y_til <- as.matrix(y - subset(par_full, select = mu))
+  dl_dphi <- vector(length = n)
+  for (ni in 1:n) {
+    dl_dphi[ni] <- y_til[ni, i] ^ 2 / par[[paste0("innov", j)]][ni]
+  }
+  return(dl_dphi) 
+}
+
+# choose `mu_score_mvnchol_ref` or `mu_score_mvnchol_C` for computing mu-scores
+phi_hess_mvnmodchol <- phi_hess_mvnmodchol_ref
 
 
 
