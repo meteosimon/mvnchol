@@ -1,5 +1,6 @@
 ^techreport
 ^tests
+^docs
 ^\\.git
 ^\\.gitignore
 ^README

@@ -10,6 +10,9 @@ techreport/*.out
 # datasets
 tests/*.RDS
 
+# pkgdown documentation
+docs/*
+
 # compiled code and shared objects
 src/*.so
 src/*.o

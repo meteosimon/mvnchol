@@ -10,7 +10,9 @@ Authors@R: c(person(given = "Thomas", family = "Muschinski", role = c("aut", "cr
 Description: Implements a prototype for a BAMLSS family modelling a multi-variate
              Gaussian distribution via the Cholesky decomposition of its
              co-varaince matrix.
-Depends: R (>= 3.4.0)
+Depends: R (>= 3.5.0)
 Encoding: UTF-8
 License: GPL-2 | GPL-3
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
+Suggests: 
+    testthat (>= 2.1.0)
