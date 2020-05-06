@@ -85,6 +85,76 @@ mvn_modchol <- function(k = 2L, ...) {
   }
   rval$hess <- hesses
 
+  # --- add precision matrix function ---
+  rval$precision <- function(par) {
+
+    k <- length(grep("innov", names(par)))
+    n <- length(par[[1]])
+
+    Linvt <- list()
+    Siginv <- list()
+
+    for (i in 1:n) {
+      Linvt[[i]] <- matrix(0, nrow = k, ncol = k)
+      for (j in 1:k) {
+        Linvt[[i]][j, j] <- par[[paste0("innov", j)]][i]
+        if (j < k) {
+          for (l in (j+1):k) {
+            Linvt[[i]][j, l] <- -par[[paste0("phi", j, l)]][i] *
+		    par[[paste0("innov", l)]][i]
+          }
+        }
+      }
+    Siginv[[i]] <- Linvt[[i]] %*% t(Linvt[[i]])
+    }
+
+    return(Siginv)
+  }
+
+  # --- add covariance matrix function ---
+  rval$covariance <- function(par) {
+
+    k <- length(grep("innov", names(par)))
+    n <- length(par[[1]])
+
+    Linvt <- list()
+    Sig <- list()
+
+    for (i in 1:n) {
+      Linvt[[i]] <- matrix(0, nrow = k, ncol = k)
+      for (j in 1:k) {
+        Linvt[[i]][j, j] <- par[[paste0("innov", j)]][i]
+        if (j < k) {
+          for (l in (j+1):k) {
+            Linvt[[i]][j, l] <- -par[[paste0("phi", j, l)]][i] *
+                    par[[paste0("innov", l)]][i]          
+	  }
+        }
+      }
+    L <- solve(Linvt[[i]])
+    Sig[[i]] <- t(L) %*% L
+    }
+
+    return(Sig)
+  }
+
+  rval$r <- function(par) {
+    n <- length(par[[1]])
+    k <- length(grep("innov", names(par)))
+    Sigs <- rval$covariance(par)
+    
+    simdat <- matrix(ncol = k, nrow = n)
+
+    for (i in 1:n) { 
+      mu_vec <- vector(length = k)
+      for (j in 1:k) {
+        mu_vec[j] <- par[[paste0("mu", j)]][i]
+      }
+      simdat[i, ] <- mvtnorm::rmvnorm(1, mean = mu_vec, sigma = Sigs[[i]])
+    }
+    return(simdat)
+  }
+  
 
   # --- set class and return ---
   class(rval) <- "family.bamlss"
