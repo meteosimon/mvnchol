@@ -141,7 +141,7 @@ mvn_modchol <- function(k = 2L, ...) {
   rval$r <- function(par) {
     n <- length(par[[1]])
     k <- length(grep("innov", names(par)))
-    Sigs <- rval$covariance(par)
+    Sigs <- rval$covariance(par)    # FIXME: Is this dangerous wrt lexical scoping?
     
     simdat <- matrix(ncol = k, nrow = n)
 
