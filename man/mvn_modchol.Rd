@@ -2,7 +2,7 @@
 % Please edit documentation in R/prototype_modchol.R
 \name{mvn_modchol}
 \alias{mvn_modchol}
-\title{Modified Cholesky MVN}
+\title{Modified Cholesky MVN -- prototype}
 \usage{
 mvn_modchol(k = 2L, ...)
 }

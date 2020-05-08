@@ -2,7 +2,7 @@
 % Please edit documentation in R/prototype_chol.R
 \name{mvn_chol}
 \alias{mvn_chol}
-\title{Cholesky MVN}
+\title{Cholesky MVN -- prototype}
 \usage{
 mvn_chol(k = 2L, ...)
 }
