@@ -1,6 +1,6 @@
 Package: bamlssMVN
 Title: MVN Cholesky family for BAMLSS
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: c(person(given = "Thomas", family = "Muschinski", role = c("aut", "cre"),
                     email = "Thomas.Muschinkski@uibk.ac.at",
                     comment = c(ORCID = "")),
