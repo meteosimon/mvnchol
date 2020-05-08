@@ -138,19 +138,24 @@ mvn_modchol <- function(k = 2L, ...) {
     return(Sig)
   }
 
-  rval$r <- function(par) {
+  rval$r <- function(par, expand = 1L) {
     n <- length(par[[1]])
     k <- length(grep("innov", names(par)))
     Sigs <- rval$covariance(par)    # FIXME: Is this dangerous wrt lexical scoping?
-    
-    simdat <- matrix(ncol = k, nrow = n)
+	# Mus (matix or list) should be generated here.   
+ 
+    simdat <- matrix(ncol = k, nrow = n * expand)
 
     for (i in 1:n) { 
       mu_vec <- vector(length = k)
       for (j in 1:k) {
         mu_vec[j] <- par[[paste0("mu", j)]][i]
       }
-      simdat[i, ] <- mvtnorm::rmvnorm(1, mean = mu_vec, sigma = Sigs[[i]])
+      simdat[seq_len(expand) + (i-1L) * expand, ] <- mvtnorm::rmvnorm(
+		n = expand,
+		mean = mu_vec,
+		sigma = Sigs[[i]]
+	  )
     }
     return(simdat)
   }
