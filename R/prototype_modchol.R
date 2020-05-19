@@ -97,11 +97,11 @@ mvn_modchol <- function(k = 2L, ...) {
     for (i in 1:n) {
       Linvt[[i]] <- matrix(0, nrow = k, ncol = k)
       for (j in 1:k) {
-        Linvt[[i]][j, j] <- par[[paste0("innov", j)]][i]
+        Linvt[[i]][j, j] <- 1 / sqrt(par[[paste0("innov", j)]][i])
         if (j < k) {
           for (l in (j+1):k) {
-            Linvt[[i]][j, l] <- -par[[paste0("phi", j, l)]][i] *
-		    par[[paste0("innov", l)]][i]
+            Linvt[[i]][j, l] <- -par[[paste0("phi", j, l)]][i] /
+		    sqrt(par[[paste0("innov", l)]][i])
           }
         }
       }
@@ -123,11 +123,11 @@ mvn_modchol <- function(k = 2L, ...) {
     for (i in 1:n) {
       Linvt[[i]] <- matrix(0, nrow = k, ncol = k)
       for (j in 1:k) {
-        Linvt[[i]][j, j] <- par[[paste0("innov", j)]][i]^(-0.5)
+        Linvt[[i]][j, j] <- 1 / sqrt(par[[paste0("innov", j)]][i])
         if (j < k) {
           for (l in (j+1):k) {
-            Linvt[[i]][j, l] <- -par[[paste0("phi", j, l)]][i] *
-                    par[[paste0("innov", l)]][i]          
+            Linvt[[i]][j, l] <- -par[[paste0("phi", j, l)]][i] /
+                    sqrt(par[[paste0("innov", l)]][i])          
 	  }
         }
       }
