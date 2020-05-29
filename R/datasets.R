@@ -2,6 +2,8 @@
 #'
 #' Simulated data to test the implementation of the bamlss families.
 #'
+#' @usage data(simdata)
+#'
 #' @examples
 #' \dontrun{
 #' ## Reproducing code

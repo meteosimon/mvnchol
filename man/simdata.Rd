@@ -8,7 +8,7 @@
 An object of class \code{list} of length 3.
 }
 \usage{
-simdata
+data(simdata)
 }
 \description{
 Simulated data to test the implementation of the bamlss families.
