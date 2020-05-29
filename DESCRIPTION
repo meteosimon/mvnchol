@@ -14,6 +14,6 @@ Depends: R (>= 3.5.0)
 Imports: Formula, mvtnorm
 Encoding: UTF-8
 License: GPL-2 | GPL-3
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0
 Suggests: 
     testthat (>= 2.1.0)

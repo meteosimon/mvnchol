@@ -1,4 +1,6 @@
+###############################################################################
 ## Simulate test case
+###############################################################################
 
 ## build orthogonal rotation matrix
 thetax <- pi/4
@@ -10,13 +12,15 @@ Rz <- matrix( c(cos(thetaz),sin(thetaz),0, -sin(thetaz),cos(thetaz),0, 0,0,1 ), 
 R <- Rx %*% Ry %*% Rz
 
 
-f0 <- function(x) qnorm(x)
+## f0 <- function(x) qnorm(x)
 f1 <- function(x) (sin(pi * x))^2
 f2 <- function(x) (cos(pi * x))^2
 
 n <- 2000
 set.seed(111)
-x0 <- runif(n); x1 <- runif(n); x2 <- runif(n)
+x0 <- runif(n)
+x1 <- runif(n)
+x2 <- runif(n)
 
 ## initialize vectors for parameter lists
 p12 <- NULL
@@ -81,6 +85,18 @@ par[["lamdiag3"]] <- lamdiag[,3]
 par[["lambda12"]] <- lambda[,1]
 par[["lambda13"]] <- lambda[,2]
 par[["lambda23"]] <- lambda[,3]
+
+simdata <- list(
+	d   = d,
+	par = par,
+	y   = y
+)
+
+save(simdata, file = "simdata.rda")
+
+###############################################################################
+#### END OF DATA SIMULATION  ##################################################
+###############################################################################
 
 source("../R/prototype_chol.R")
 

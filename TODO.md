@@ -5,7 +5,7 @@ TODO
 
 * **CHECK** Increse Version.
 
-* Add simulated data. Example should hold code for reproduction.
+* **CHECK** Add simulated data. Example should hold code for reproduction.
 
 * Dublicate family R-scripts. (Devel and reference family).
     Ref family functions start with a dot.
