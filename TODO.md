@@ -1,9 +1,9 @@
 TODO
 ====
 
-Deliverables (aligned with commits) for introdcing testing:
+## Deliverables (aligned with commits) for introdcing testing:
 
-* Increse Version.
+* **CHECK** Increse Version.
 
 * Add simulated data. Example should hold code for reproduction.
 
@@ -34,4 +34,11 @@ Deliverables (aligned with commits) for introdcing testing:
 
 * Increase Version.
 
+## Further Deliverables 
+
+* Work on `README.md`. Make it more informative:
+
+	- Show parameterization.
+
+	- Minimal example.
 
