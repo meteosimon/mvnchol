@@ -6,7 +6,7 @@
 \alias{bamlssMVN-package}
 \title{bamlssMVN: MVN Cholesky family for BAMLSS}
 \description{
-Implements a prototype for a BAMLSS family modelling a multi-variate
+Implements a BAMLSS family modelling a multi-variate
              Gaussian distribution via the Cholesky decomposition of its
              co-varaince matrix.
 }
@@ -17,11 +17,11 @@ responses. The variance-covariance matrix is re-parameterized by
 the (modified) Cholesky decomposition.
 The key function to generate a family is \code{mvnchol_bamlss}.
 You can adjust the dimension \code{k} of the multivariate normal,
-and its \cdoe{type} of Cholesky decompositions: \code{"basic"} or
+and its \code{type} of Cholesky decompositions: \code{"basic"} or
 \code{"modified"}.
 }
 \author{
-\strong{Maintainer}: Thomas Muschinski \email{Thomas.Muschinkski@uibk.ac.at}
+\strong{Maintainer}: Thomas Muschinski \email{Thomas.Muschinkski@uibk.ac.at} (\href{https://orcid.org/0000-0001-9084-0721}{ORCID})
 
 Authors:
 \itemize{
