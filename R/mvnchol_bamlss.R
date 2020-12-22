@@ -8,8 +8,8 @@
 #' 
 #'
 #' @param k integer. The dimension of the multivariate distribution.
-#' @param type character. Choose standard Cholesky "basic" or modified
-#'        Cholesky "modified".
+#' @param type character. Choose \code{"basic"} Cholesky decomposition or \code{"modified"}
+#'        Cholesky decomposition.
 #' @param ... not used.
 #' @return a bamlss family.
 #' @export

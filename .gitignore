@@ -17,4 +17,8 @@ docs/*
 src/*.so
 src/*.o
 
+# tests
+tests/testthat.R
+tests/testthat/*
+
 

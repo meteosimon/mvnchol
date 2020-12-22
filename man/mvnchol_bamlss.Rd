@@ -4,13 +4,13 @@
 \alias{mvnchol_bamlss}
 \title{Cholesky MVN}
 \usage{
-mvnchol_bamlss(k, type = c("chol", "modified"), ...)
+mvnchol_bamlss(k, type = c("basic", "modified", "chol"), ...)
 }
 \arguments{
 \item{k}{integer. The dimension of the multivariate distribution.}
 
-\item{type}{character. Choose standard Cholesky "chol" or modified
-Cholesky "modified".}
+\item{type}{character. Choose \code{"basic"} Cholesky decomposition or \code{"modified"}
+Cholesky decomposition.}
 
 \item{...}{not used.}
 }
