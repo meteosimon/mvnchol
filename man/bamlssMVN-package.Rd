@@ -26,6 +26,7 @@ and its \code{type} of Cholesky decompositions: \code{"basic"} or
 Authors:
 \itemize{
   \item Thorsten Simon \email{Thorsten.Simon@uibk.ac.at} (\href{https://orcid.org/0000-0002-3778-7738}{ORCID})
+  \item Achim Zeileis \email{Achim.Zeileis@R-project.org} (\href{https://orcid.org/0000-0003-0918-3766}{ORCID})
 }
 
 }
