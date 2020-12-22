@@ -8,14 +8,15 @@
 #' 
 #'
 #' @param k integer. The dimension of the multivariate distribution.
-#' @param type character. Choose standard Cholesky "chol" or modified
+#' @param type character. Choose standard Cholesky "basic" or modified
 #'        Cholesky "modified".
 #' @param ... not used.
 #' @return a bamlss family.
 #' @export
-mvnchol_bamlss <- function(k, type = c("chol", "modified"), ...) {
+mvnchol_bamlss <- function(k, type = c("basic", "modified", "chol"), ...) {
 	type <- match.arg(type)
 	switch(type,
+		basic = mvn_chol(k = k, ...),
 		chol = mvn_chol(k = k, ...),
 		modified = mvn_modchol(k = k, ...)
 	)
