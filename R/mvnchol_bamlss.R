@@ -5,11 +5,10 @@
 #' BAMLSS families that models a multivariate Normal (Gaussian)
 #' distribution by (modified) Cholesky decomposition of the covariance
 #' matrix.
-#' 
 #'
 #' @param k integer. The dimension of the multivariate distribution.
 #' @param type character. Choose \code{"basic"} Cholesky decomposition or \code{"modified"}
-#'        Cholesky decomposition.
+#'        Cholesky decomposition. (For back compatibility \code{"chol"} is identical to \code{"basic"}.)
 #' @param ... not used.
 #' @return a bamlss family.
 #' @export

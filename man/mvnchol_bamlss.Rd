@@ -10,7 +10,7 @@ mvnchol_bamlss(k, type = c("basic", "modified", "chol"), ...)
 \item{k}{integer. The dimension of the multivariate distribution.}
 
 \item{type}{character. Choose \code{"basic"} Cholesky decomposition or \code{"modified"}
-Cholesky decomposition.}
+Cholesky decomposition. (For back compatibility \code{"chol"} is identical to \code{"basic"}.)}
 
 \item{...}{not used.}
 }
