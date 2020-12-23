@@ -15,3 +15,6 @@ build:
 install:
 	Rscript -e 'devtools::install()'
 
+README.md: README.Rmd
+	Rscript -e 'rmarkdown::render("README.Rmd", output_format = "md_document")'
+
