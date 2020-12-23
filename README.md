@@ -19,7 +19,7 @@ Innsbruck. The repository has public access.
     devtools::install_git("https://git.uibk.ac.at/c4031039/bamlss_mvn")
 
 -   Or clone it using [git](https://git-scm.com/) and a git client for
-    your system. And build and INSTALL it after cloning, e.g.:
+    your system. And build and INSTALL it after cloning, e.g. in a bash:
 
 <!-- -->
 
