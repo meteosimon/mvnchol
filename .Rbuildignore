@@ -7,4 +7,5 @@
 ^TODO
 ^Makefile
 R/simulator.R
+^README_files
 
