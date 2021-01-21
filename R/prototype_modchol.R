@@ -10,7 +10,7 @@
 #' @param ... not used.
 #' @return a bamlss family.
 #' @export
-#' @useDynLib bamlssMVN, .registration = TRUE
+#' @useDynLib mvnchol, .registration = TRUE
 mvn_modchol <- function(k = 2L, ...) {
   # --- set names of distributional parameters ---
   mu <- paste0("mu", seq_len(k))
@@ -207,7 +207,7 @@ log_dmvnmodchol_C <- function(y, par) {
   n <- nrow(y)
   k <- ncol(y)
   par <- do.call("cbind", par)
-  .Call("log_dmvnmodcholC", y, par, n, k, PACKAGE = "bamlssMVN")
+  .Call("log_dmvnmodcholC", y, par, n, k, PACKAGE = "mvnchol")
 }
 
 # choose `log_dmvnchol_ref` or `log_dmvnchol_C` for computing the log-density
@@ -252,7 +252,7 @@ mu_score_mvnmodchol_C <- function(y, par, j) {
   k <- ncol(y)
   par <- do.call("cbind", par)
   j <- as.integer(j)
-  .Call("mu_score_mvnmodcholC", y, par, n, k, j, PACKAGE = "bamlssMVN")
+  .Call("mu_score_mvnmodcholC", y, par, n, k, j, PACKAGE = "mvnchol")
 }
 
 # choose `mu_score_mvnchol_ref` or `mu_score_mvnchol_C` for computing mu-scores
@@ -293,7 +293,7 @@ innov_score_mvnmodchol_C <- function(y, par, j) {
   k <- ncol(y)
   par <- do.call("cbind", par)
   j <- as.integer(j)
-  .Call("innov_score_mvnmodcholC", y, par, n, k, j, PACKAGE = "bamlssMVN")
+  .Call("innov_score_mvnmodcholC", y, par, n, k, j, PACKAGE = "mvnchol")
 }
 
 # choose `mu_score_mvnchol_ref` or `mu_score_mvnchol_C` for computing mu-scores
@@ -337,7 +337,7 @@ phi_score_mvnmodchol_C <- function(y, par, i, j) {
   par <- do.call("cbind", par)
   i <- as.integer(i)
   j <- as.integer(j)
-  .Call("phi_score_mvnmodcholC", y, par, n, k, i, j, PACKAGE = "bamlssMVN")
+  .Call("phi_score_mvnmodcholC", y, par, n, k, i, j, PACKAGE = "mvnchol")
 }
 
 # choose `mu_score_mvnchol_ref` or `mu_score_mvnchol_C` for computing mu-scores
