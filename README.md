@@ -37,24 +37,6 @@ First Model
 -----------
 
     library(bamlss)
-
-    ## Loading required package: coda
-
-    ## Loading required package: colorspace
-
-    ## Loading required package: mgcv
-
-    ## Loading required package: nlme
-
-    ## This is mgcv 1.8-33. For overview type 'help("mgcv-package")'.
-
-    ## 
-    ## Attaching package: 'bamlss'
-
-    ## The following object is masked from 'package:mgcv':
-    ## 
-    ##     smooth.construct
-
     library(mvnchol)
     data(simdata)
     d <- simdata$d
