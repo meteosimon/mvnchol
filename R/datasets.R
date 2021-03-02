@@ -1,3 +1,54 @@
+#' Temperature data.
+#'
+#' Temperature Data for Innsbruck Airport
+#'
+#' Numerical weather predictions (NWP) and observations of
+#' 2 meter temperature at Innsbruck Airport.
+#' The observations from the SYNOP station 11120 cover 5 years from
+#  2015-01-01 to 2019-31-12.
+#' The NWP data are derived from GEFS reforecasts (Hamill et al. 2013).
+#' The data contain following variables:
+#'
+#' \begin{itemize}
+#'   \item \code{init}: Time of initialization of the NWP model.
+#'   \item \code{obs_*}: Observations for lead time \code{*}.
+#'   \item \code{mean_ens_*}: NWP ensemble mean for lead time \code{*}.
+#'   \item \code{logsd_ens_*}: NWP logarithm of ensemble standard deviation for lead time \code{*}.
+#'   \item \code{yday}: Yearday.
+#' \end{itemize}
+#'
+#' @usage data(TempIbk)
+#'
+#' @examples
+#' \dontrun{
+#' library(bamlss)
+#' library(mvnchol)
+#' load("TempIbk.rda")
+#' 
+#' mean_names <- names(TempIbk)[grep("mean_", names(TempIbk))]
+#' logsd_names <- names(TempIbk)[grep("logsd_", names(TempIbk))]
+#' obs_names <- names(TempIbk)[grep("obs", names(TempIbk))]
+#' 
+#' f_mus <- paste0(obs_names, " ~ s(yday, bs = 'cc') + s(yday, bs = 'cc', by = ", mean_names, ")")
+#' f_mus[[1]]
+#' f_lamdiags <- paste0("lamdiag", seq_along(logsd_names),
+#' 	" ~ s(yday, bs = 'cc') + s(yday, bs = 'cc', by = ", logsd_names, ")")
+#' f_lamdiags[[1]]
+#' 
+#' paste_lambda <- function(x) paste0("lambda", x[1], x[2], " ~ s(yday, bs = 'cc')")
+#' f_lambdas <- combn(seq_along(logsd_names), 2, paste_lambda, simplify = FALSE)
+#' f_lambdas[[1]]
+#' 
+#' f <- lapply(c(f_mus, f_lamdiags, f_lambdas), as.formula)
+#' 
+#' fam <- mvnchol_bamlss(k = length(logsd_names), type = "basic")
+#' 
+#' b <- bamlss(f, family = fam, data = TempIbk,
+#' 	sampler = FALSE, optimizer = opt_boost, maxit = 1000)
+#' }
+#'
+"TempIbk"
+
 #' Reference data.
 #'
 #' Simulated data to test the implementation of the bamlss families.

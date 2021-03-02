@@ -9,6 +9,7 @@ techreport/*.out
 
 # datasets
 tests/*.RDS
+data_prepare/*
 
 # pkgdown documentation
 docs/*
