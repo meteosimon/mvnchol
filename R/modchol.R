@@ -1,4 +1,4 @@
-#' Modified Cholesky MVN -- prototype
+#' Modified Cholesky MVN
 #'
 #' BAMLSS Family for MVN with Modified Cholesky Parameterization
 #'
