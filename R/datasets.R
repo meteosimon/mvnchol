@@ -9,13 +9,19 @@
 #' The NWP data are derived from GEFS reforecasts (Hamill et al. 2013).
 #' The data contain following variables:
 #'
-#' \begin{itemize}
+#' \itemize{
 #'   \item \code{init}: Time of initialization of the NWP model.
 #'   \item \code{obs_*}: Observations for lead time \code{*}.
 #'   \item \code{mean_ens_*}: NWP ensemble mean for lead time \code{*}.
 #'   \item \code{logsd_ens_*}: NWP logarithm of ensemble standard deviation for lead time \code{*}.
 #'   \item \code{yday}: Yearday.
-#' \end{itemize}
+#' }
+#'
+#' @references
+#'   Hamill TM, Bates GT, Whitaker JS, Murray DR, Fiorino M, Galarneau Jr TJ,
+#'     Zhu Y, Lapenta W (2013). NOAA's Second-Generation Global Medium-Range
+#'     Ensemble Reforecast Data Set. \emph{Bulletin of the American Meteorological
+#'     Society}, 94(10), 1553-1565.
 #'
 #' @usage data(TempIbk)
 #'
