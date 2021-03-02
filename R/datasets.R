@@ -31,9 +31,9 @@
 #' library(mvnchol)
 #' load("TempIbk.rda")
 #' 
-#' mean_names <- names(TempIbk)[grep("mean_", names(TempIbk))]
-#' logsd_names <- names(TempIbk)[grep("logsd_", names(TempIbk))]
-#' obs_names <- names(TempIbk)[grep("obs", names(TempIbk))]
+#' mean_names <- names(TempIbk)[grep("mean_ens_", names(TempIbk))]
+#' logsd_names <- names(TempIbk)[grep("logsd_ens_", names(TempIbk))]
+#' obs_names <- names(TempIbk)[grep("obs_", names(TempIbk))]
 #' 
 #' f_mus <- paste0(obs_names, " ~ s(yday, bs = 'cc') + s(yday, bs = 'cc', by = ", mean_names, ")")
 #' f_mus[[1]]
@@ -50,7 +50,7 @@
 #' fam <- mvnchol_bamlss(k = length(logsd_names), type = "basic")
 #' 
 #' b <- bamlss(f, family = fam, data = TempIbk,
-#' 	sampler = FALSE, optimizer = opt_boost, maxit = 1000)
+#' 	sampler = FALSE, optimizer = opt_boost, maxit = 5000)
 #' }
 #'
 "TempIbk"
