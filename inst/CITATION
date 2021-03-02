@@ -1,0 +1,19 @@
+bibentry(
+	bibtype     = "TechReport",
+	author      = c(
+		person("Thomas", "Muschinski"),
+		person(c("Georg", "J."), "Mayr"),
+		person("Thorsten", "Simon"),
+		person("Achim", "Zeileis")
+	),
+	title       = "Cholesky-Based Multivariate {G}aussian Regression",
+	institution = "arXiv.org E-Print Archive",
+	year        = "2021",
+	type        = "arXiv",
+	number      = "2102.13518",
+	month       = "February",
+	url         = "https://arxiv.org/abs/2102.13518",
+	header = "To cite mvnchol in publications use:"
+)
+
+
