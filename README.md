@@ -1,8 +1,9 @@
 mvnchol
 =======
 
-[**BAMLSS**](http://www.bamlss.org/) families for multivariate
-Gaussion regression models. The multivariate Gaussian distribution is
+[**BAMLSS**](http://www.bamlss.org/) families for
+[multivariate Gaussion regression](https://arxiv.org/abs/2102.13518)
+models. The multivariate Gaussian distribution is
 reparameterized using the (modified) Cholesky
 decomposition of the covariance matrix.
 
