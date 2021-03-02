@@ -1,8 +1,9 @@
-bamlssMVN
-=========
+mvnchol
+=======
 
-[**BAMLSS**](http://www.bamlss.org/) families for modelling multivariate
-normal distributions reparameterized using the (modified) Cholesky
+[**BAMLSS**](http://www.bamlss.org/) families for multivariate
+Gaussion regression models. The multivariate Gaussian distribution is
+reparameterized using the (modified) Cholesky
 decomposition of the covariance matrix.
 
 Installation
