@@ -64,7 +64,7 @@
 #' 	 xlab = "lead time in hours", ylab = "lead time in hours",
 #' 	 main = "Correlation matrix fitted for 2015-10-10")
 #' axis(1, lead)
-#' axis(2, lead)
+#' axis(2, lead, rev(lead)
 #' box()
 #' 
 #' ## plot means and standard deviations
