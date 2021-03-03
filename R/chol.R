@@ -156,7 +156,32 @@ mvn_chol <- function(k = 2L, ...) {
      lapply(lst, do.call, what = "c")
    }
 
-  ## --- TODO: extract st dev ---
+  ## --- extract st dev ---
+  rval$stdev <- function(par) {
+    k <- length(grep("lamdiag", names(par)))
+    n <- length(par[[1]])
+
+    Linvt <- list()
+    Sig <- list()
+
+    ## --- FIXME: @Thomas: I'm not sure what would be sufficient to compute the sd ---
+    ## ---                 Please help to simplify this code!!! ---
+    for (i in 1:n) {
+      Linvt[[i]] <- matrix(0, nrow = k, ncol = k)
+      for (j in 1:k) {
+        Linvt[[i]][j, j] <- par[[paste0("lamdiag", j)]][i]
+        if (j < k) {
+          for (l in (j+1):k) {
+            Linvt[[i]][j, l] <- par[[paste0("lambda", j, l)]][i]
+          }
+        }
+      }
+      L <- solve(Linvt[[i]])
+      Sig[[i]] <- t(L) %*% L
+    }
+
+	lapply(Sig, function(x) stats::setNames(sqrt(diag(x)), nm = paste0("sig", seq_len(k))))
+  }
 
   # --- set class and return ---
   class(rval) <- "family.bamlss"

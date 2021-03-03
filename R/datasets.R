@@ -68,7 +68,7 @@
 #' box()
 #' 
 #' ## plot means and standard deviations
-#' stdev <- sqrt(diag(fam$covariance(fit)[[1]]))
+#' stdev <- fam$stdev(fit)[[1]]
 #' means <- fam$means(fit)[[1]]
 #' lower <- means - stdev
 #' upper <- means + stdev
