@@ -53,6 +53,35 @@
 #' 
 #' ## fit boosting model
 #' b <- bamlss(f, family = fam, data = TempIbk, optimizer = opt_boost, maxit = 1000, sampler = FALSE)
+#' 
+#' ## predict sample case
+#' nd <- subset(TempIbk, init == "2015-10-10")
+#' fit <- predict(b, newdata = nd, type = "parameter", mstop = 5000)
+#' 
+#' ## plot correlation matrix for GEFS initialization 2015-10-10
+#' image(lead, lead, fam$correlation(fit)[[1]][5:1, ],
+#' 	 col = hcl.colors(12, "Blues 3", rev = TRUE), axes = FALSE,
+#' 	 xlab = "lead time in hours", ylab = "lead time in hours",
+#' 	 main = "Correlation matrix fitted for 2015-10-10")
+#' axis(1, lead)
+#' axis(2, lead)
+#' box()
+#' 
+#' ## plot means and standard deviations
+#' stdev <- sqrt(diag(fam$covariance(fit)[[1]]))
+#' means <- fam$means(fit)[[1]]
+#' lower <- means - stdev
+#' upper <- means + stdev
+#' 
+#' plot(lead, means, type = 'b', cex = 2, lwd = 1, lty = 2, axes = FALSE,
+#' 	 ylim = c(min(lower), max(upper)),
+#' 	 ylab = expression("Temperature in " * degree * "C"),
+#' 	 xlab = "lead time in hours",
+#' 	 main = "Means +/- one st. dev. for 2015-10-10")
+#' segments(lead, y0 = lower, y1 = upper)
+#' axis(1, lead)
+#' axis(2)
+#' box()
 #' }
 #'
 "TempIbk"

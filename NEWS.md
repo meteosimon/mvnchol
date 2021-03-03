@@ -1,6 +1,7 @@
 # mvnchol 0.2.0
 
 * Add GEFS Innsbruck data.
+* `means()` function to extract means for basic Cholesky.
 
 # mvnchol 0.1.3
 

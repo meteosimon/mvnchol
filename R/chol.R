@@ -142,7 +142,21 @@ mvn_chol <- function(k = 2L, ...) {
     return(Cor)
   }
 
+   ## --- extract means ---
+   rval$means <- function(par) {
+     ## actually no need to compute k due to lexical scoping
+     ## but added here to be consistent w/ the other functions
+     k <- length(grep("lamdiag", names(par)))
+     n <- length(par[[1]])
 
+	 ## Transpose list
+     ## this could also be done like this (might be faster for some cases)
+     ### lapply(purrr::transpose(par[seq_len(k)]), do.call, what = "c")
+     lst <- lapply(seq_len(n), function(x) lapply(par[seq_len(k)], `[[`, i = x))
+     lapply(lst, do.call, what = "c")
+   }
+
+  ## --- TODO: extract st dev ---
 
   # --- set class and return ---
   class(rval) <- "family.bamlss"
