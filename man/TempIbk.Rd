@@ -41,13 +41,13 @@ lead <- seq(192, 216, by = 6)
 ## set up formulas
 f <- c(
   ## mu equations
-  sprintf('obs_%s ~ s(yday, bs = "cc") + s(yday, bs = "cc", by = mean_ens_%s)', lead, lead),
+  sprintf('obs_\%s ~ s(yday, bs = "cc") + s(yday, bs = "cc", by = mean_ens_\%s)', lead, lead),
 
   ## lambda diag equations
-  sprintf('lamdiag%s ~ s(yday, bs = "cc") + s(yday, bs = "cc", by = logsd_ens_%s)', 1:5, lead),
+  sprintf('lamdiag\%s ~ s(yday, bs = "cc") + s(yday, bs = "cc", by = logsd_ens_\%s)', 1:5, lead),
 
   ## lambda off-diag equations
-  sprintf('lambda%s ~ s(yday, bs = "cc")', apply(combn(1:5, 2), 2, paste, collapse = ""))
+  sprintf('lambda\%s ~ s(yday, bs = "cc")', apply(combn(1:5, 2), 2, paste, collapse = ""))
 )
 f <- lapply(f, as.formula)
 
@@ -55,7 +55,7 @@ f <- lapply(f, as.formula)
 fam <- mvnchol_bamlss(k = 5, type = "basic")
 
 ## fit boosting model
-b <- bamlss(f, family = fam, data = TempIbk, sampler = FALSE, optimizer = opt_boost, maxit = 1000)
+b <- bamlss(f, family = fam, data = TempIbk, optimizer = opt_boost, maxit = 1000, sampler = FALSE)
 }
 
 }

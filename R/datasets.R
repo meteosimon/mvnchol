@@ -27,30 +27,32 @@
 #'
 #' @examples
 #' \dontrun{
-#' library(bamlss)
-#' library(mvnchol)
-#' load("TempIbk.rda")
+#' ## packages and data
+#' library("bamlss")
+#' library("mvnchol")
+#' data("TempIbk", package = "mvnchol")
 #' 
-#' mean_names <- names(TempIbk)[grep("mean_ens_", names(TempIbk))]
-#' logsd_names <- names(TempIbk)[grep("logsd_ens_", names(TempIbk))]
-#' obs_names <- names(TempIbk)[grep("obs_", names(TempIbk))]
+#' ## five lead times
+#' lead <- seq(192, 216, by = 6)
 #' 
-#' f_mus <- paste0(obs_names, " ~ s(yday, bs = 'cc') + s(yday, bs = 'cc', by = ", mean_names, ")")
-#' f_mus[[1]]
-#' f_lamdiags <- paste0("lamdiag", seq_along(logsd_names),
-#' 	" ~ s(yday, bs = 'cc') + s(yday, bs = 'cc', by = ", logsd_names, ")")
-#' f_lamdiags[[1]]
+#' ## set up formulas
+#' f <- c(
+#'   ## mu equations
+#'   sprintf('obs_%s ~ s(yday, bs = "cc") + s(yday, bs = "cc", by = mean_ens_%s)', lead, lead),
 #' 
-#' paste_lambda <- function(x) paste0("lambda", x[1], x[2], " ~ s(yday, bs = 'cc')")
-#' f_lambdas <- combn(seq_along(logsd_names), 2, paste_lambda, simplify = FALSE)
-#' f_lambdas[[1]]
+#'   ## lambda diag equations
+#'   sprintf('lamdiag%s ~ s(yday, bs = "cc") + s(yday, bs = "cc", by = logsd_ens_%s)', 1:5, lead),
 #' 
-#' f <- lapply(c(f_mus, f_lamdiags, f_lambdas), as.formula)
+#'   ## lambda off-diag equations
+#'   sprintf('lambda%s ~ s(yday, bs = "cc")', apply(combn(1:5, 2), 2, paste, collapse = ""))
+#' )
+#' f <- lapply(f, as.formula)
 #' 
-#' fam <- mvnchol_bamlss(k = length(logsd_names), type = "basic")
+#' ## multivariate normal family with basic Cholesky parameterization
+#' fam <- mvnchol_bamlss(k = 5, type = "basic")
 #' 
-#' b <- bamlss(f, family = fam, data = TempIbk,
-#' 	sampler = FALSE, optimizer = opt_boost, maxit = 5000)
+#' ## fit boosting model
+#' b <- bamlss(f, family = fam, data = TempIbk, optimizer = opt_boost, maxit = 1000, sampler = FALSE)
 #' }
 #'
 "TempIbk"
