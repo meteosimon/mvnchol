@@ -17,6 +17,7 @@ Temperature Data for Innsbruck Airport
 Numerical weather predictions (NWP) and observations of
 2 meter temperature at Innsbruck Airport.
 The observations from the SYNOP station 11120 cover 5 years from
+2015-01-01 to 2019-31-12.
 The NWP data are derived from GEFS reforecasts (Hamill et al. 2013).
 The data contain following variables:
 
