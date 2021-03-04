@@ -55,37 +55,53 @@ f <- lapply(f, as.formula)
 ## multivariate normal family with basic Cholesky parameterization
 fam <- mvnchol_bamlss(k = 5, type = "basic")
 
-## fit boosting model
-b <- bamlss(f, family = fam, data = TempIbk, optimizer = opt_boost, maxit = 1000, sampler = FALSE)
+## fit model
+b <- bamlss(f, family = fam, data = TempIbk, optimizer = opt_boost, maxit = 1000)
+
+## diagnose effects
+par(mfrow = c(2, 2))
+plot(b, model = "mu1", scale = 0, spar = FALSE)
+plot(b, model = "lamdiag2", term = "s(yday)", spar = FALSE)
+plot(b, model = "lambda12")
 
 ## predict sample case
-nd <- subset(TempIbk, init == "2015-10-10")
-fit <- predict(b, newdata = nd, type = "parameter", mstop = 5000)
+nd <- subset(TempIbk, init \%in\% as.POSIXct(c("2015-01-03", "2015-10-10")))
+fit <- predict(b, newdata = nd, type = "parameter")
 
 ## plot correlation matrix for GEFS initialization 2015-10-10
-image(lead, lead, fam$correlation(fit)[[1]][5:1, ],
-	 col = hcl.colors(12, "Blues 3", rev = TRUE), axes = FALSE,
-	 xlab = "lead time in hours", ylab = "lead time in hours",
-	 main = "Correlation matrix fitted for 2015-10-10")
-axis(1, lead)
-axis(2, lead, rev(lead)
-box()
+plot_cor <- function(i) {
+    image(lead, lead, fam$correlation(fit)[[i]][5:1, ], zlim = c(0, 1),
+    	 col = hcl.colors(10, "Blues 3", rev = TRUE), axes = FALSE,
+    	 xlab = "lead time in hours", ylab = "lead time in hours",
+    	 main = sprintf("Correlation matrix fitted for \%s", nd[i, "init"]))
+    axis(1, lead)
+    axis(2, lead, rev(lead))
+    box()
+}
+par(mfrow = c(1, 2))
+plot_cor(1)
+plot_cor(2)
 
 ## plot means and standard deviations
-stdev <- fam$stdev(fit)[[1]]
-means <- fam$means(fit)[[1]]
-lower <- means - stdev
-upper <- means + stdev
-
-plot(lead, means, type = 'b', cex = 2, lwd = 1, lty = 2, axes = FALSE,
-	 ylim = c(min(lower), max(upper)),
-	 ylab = expression("Temperature in " * degree * "C"),
-	 xlab = "lead time in hours",
-	 main = "Means +/- one st. dev. for 2015-10-10")
-segments(lead, y0 = lower, y1 = upper)
-axis(1, lead)
-axis(2)
-box()
+plot_ms <- function(i) {
+	stdev <- fam$stdev(fit)[[i]]
+	means <- fam$means(fit)[[i]]
+	lower <- means - stdev
+	upper <- means + stdev
+	
+	plot(lead, means, type = 'b', cex = 2, lwd = 1, lty = 2, axes = FALSE,
+		 ylim = c(-6, 16), # c(min(lower), max(upper)),
+		 ylab = expression("Temperature in " * degree * "C"),
+		 xlab = "lead time in hours",
+		 main = sprintf("Means +/- one st. dev. for \%s", nd[i, "init"]))
+	segments(lead, y0 = lower, y1 = upper)
+	axis(1, lead)
+	axis(2)
+	box()
+}
+par(mfrow = c(1, 2))
+plot_ms(1)
+plot_ms(2)
 }
 
 }
