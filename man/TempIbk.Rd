@@ -65,7 +65,7 @@ plot(b, model = "lamdiag2", term = "s(yday)", spar = FALSE)
 plot(b, model = "lambda12")
 
 ## predict sample case
-nd <- subset(TempIbk, init \%in\% as.POSIXct(c("2015-01-03", "2015-10-10")))
+nd <- subset(TempIbk, format(init, "\%Y-\%m-\%d") \%in\% c("2015-01-03", "2015-10-10"))
 fit <- predict(b, newdata = nd, type = "parameter")
 
 ## plot correlation matrix for GEFS initialization 2015-10-10
