@@ -2,10 +2,18 @@
 ## compare with dist_mvnorn l. 2208 in families.R of disttree pkg
 dist_mvn_modchol <- function(k, ...) {
     stop("distree family for modified Choesky is not implemented yet!")
-    klt <- k * (k - 1L) / 2L  ## number of elements in the lower triangle of Sigma (and similar matrices)
-    kn <- k + k + klt ## number of all distributional parameters
-    nms_par <- c("")  ## character vector with names of distributional paramters
-    nms_eta <- c("")  ## character vector with names of predictors, ie link(distributional paramters)
+
+    ## klt <- k * (k - 1L) / 2L  ## number of elements in the lower triangle of Sigma (and similar matrices)
+    ## kn <- k + k + klt ## number of all distributional parameters
+
+    # --- set names of distributional parameters ---
+    mu <- paste0("mu_", seq_len(k))
+    innov <- paste0("innov_", seq_len(k))
+    phi <- utils::combn(seq_len(k), 2, function(x) paste("phi", x[1], x[2], sep = "_"))
+    k_phi <- k * (k-1) / 2    ## number of phi parameters
+    k_all <- k + k + k_phi    ## number of all parameters
+    nms_par <- c(mu, innov, phi)
+    nms_eta <- c(mu, paste0("log(", innov, ")"), phi)
 
     ## TODO: density
     ## Input:
@@ -18,12 +26,18 @@ dist_mvn_modchol <- function(k, ...) {
     }
 
     ## TODO: scores
+    ## Output:
+    ## matrix (n x k) with scores contrbutions
     sdist <- function(y, eta, weights = NULL, sum = FALSE) {
 
     }
 
     ## links TODO: must be conditioned on k
-    link <- c("identity", "log")[c(rep(1, k), rep(2, k), rep(1, klt))]
+    link <- c(
+        rep("identity", k),
+        rep("log", k),
+        rep("identity", k_phi)
+    )
 
     linkfun <- function(par) {
         eta <- par
@@ -40,7 +54,7 @@ dist_mvn_modchol <- function(k, ...) {
     }
     
     linkinvdr <- function(eta) {
-        dpardeta <- rep(1, kn)
+        dpardeta <- rep(1, k_all)
         dpardeta[seq_len(k) + k] <- exp(eta[seq_len(k) + k])
         names(dpardeta) <- nms_par
         return(dpardeta)
@@ -48,6 +62,8 @@ dist_mvn_modchol <- function(k, ...) {
 
     ## TODO: startfun should give MLE for all distributional parameters
     ##       (code comes from univariate gaussian dittree family)
+    ## Output:
+    ## vector with ML estimates of distributional parameters
     startfun <- function(y, weights = NULL) {
         if(is.null(weights) || (length(weights) == 0L)) {
             mu <- mean(y)
