@@ -1,3 +1,7 @@
+# mvnchol 0.3.0
+
+* Add disttree families.
+
 # mvnchol 0.2.0
 
 * Add GEFS Innsbruck data.

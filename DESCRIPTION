@@ -1,6 +1,6 @@
 Package: mvnchol
-Title: MVN Cholesky family for BAMLSS
-Version: 0.2.0
+Title: MVN Cholesky family for BAMLSS and disttree
+Version: 0.3.0
 Authors@R: c(person(given = "Thomas", family = "Muschinski", role = c("aut", "cre"),
                     email = "Thomas.Muschinkski@uibk.ac.at",
                     comment = c(ORCID = "0000-0001-9084-0721")),
