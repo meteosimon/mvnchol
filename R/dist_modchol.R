@@ -1,7 +1,5 @@
 ## distree family for modified Choesky
 ## compare with dist_mvnorn l. 2208 in families.R of disttree pkg
-#' @param k Integer, the dimension of the observation.
-#' @param r Integer, the number of off-diagonals to model (AD-r covariance).
 dist_mvn_modchol <- function(k, r = k - 1L, ...) {
 
     # --- set names of distributional parameters ---
@@ -141,14 +139,14 @@ dist_mvn_modchol <- function(k, r = k - 1L, ...) {
             starteta[nms_mu] <- colMeans(y) # Estimates for mus
           
             y_til <- y - matrix(rep(starteta[nms_mu], n), ncol = k, byrow = TRUE) 
-            starteta[["log(innov_1)"]] <- var(y_til[, 1])
+            starteta[["log(innov_1)"]] <- stats::var(y_til[, 1])
             for (i in 2:k) {
                 X <- y_til[, max(1, r-k):(i-1)] 
                 beta_vec <- solve(t(X) %*% X) %*% t(X) %*% y_til[, i]            
                 starteta[paste0("phi_", max(1, r-k):(i-1) ,"_", i)] <- beta_vec
     
                 starteta[paste0("log(innov_", i, ")")] <-
-                    log(var(y_til[, i] - as.vector(X %*% beta_vec)))
+                    log(stats::var(y_til[, i] - as.vector(X %*% beta_vec)))
             } 
         } else {
             stop("Weights not implemented for startfun")

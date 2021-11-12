@@ -4,7 +4,7 @@
 \name{mvnchol-package}
 \alias{mvnchol}
 \alias{mvnchol-package}
-\title{mvnchol: MVN Cholesky family for BAMLSS}
+\title{mvnchol: MVN Cholesky family for BAMLSS and disttree}
 \description{
 Implements a BAMLSS family modelling a multi-variate
              Gaussian distribution via the Cholesky decomposition of its
