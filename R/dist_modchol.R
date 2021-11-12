@@ -1,6 +1,6 @@
 ## distree family for modified Choesky
 ## compare with dist_mvnorn l. 2208 in families.R of disttree pkg
-dist_mvn_modchol <- function(k, ...) {
+dist_mvn_modchol <- function(k, r, ...) {
     stop("distree family for modified Choesky is not implemented yet!")
 
     ## klt <- k * (k - 1L) / 2L  ## number of elements in the lower triangle of Sigma (and similar matrices)
@@ -9,13 +9,13 @@ dist_mvn_modchol <- function(k, ...) {
     # --- set names of distributional parameters ---
     nms_mu <- paste0("mu_", seq_len(k))
     nms_innov <- paste0("innov_", seq_len(k))
-    nms_phi <- utils::combn(seq_len(k), 2, function(x) paste("phi", x[1], x[2], sep = "_"))
-    k_phi <- k * (k-1) / 2    ## number of phi parameters
+    combns <- utils::combn(k, 2)
+    combns_cut <- combns[, which((combns[2, ] - combns[1, ]) <= r)]
+    nms_phi <- paste("phi", combns_cut[1, ], combns_cut[2, ], sep = "_")
+    k_phi <- ncol(combns_cut) # number of phi parameters
     k_all <- k + k + k_phi    ## number of all parameters
     nms_par <- c(nms_mu, nms_innov, nms_phi)
     nms_eta <- c(nms_mu, paste0("log(", nms_innov, ")"), nms_phi)
-    combns <- utils::combn(k, 2)
-
 
     ## TODO: density
     ## Input:
@@ -36,8 +36,8 @@ dist_mvn_modchol <- function(k, ...) {
         y_tild <- y_til[ni, ]
         L_inv <- matrix(0, nrow = k, ncol = k) # initialise L^-1 matrix
         for (l in 1:k_phi) { # assign off diagonal values    
-	  i <- combns[1, l]
-          j <- combns[2, l]
+	  i <- combns_cut[1, l]
+          j <- combns_cut[2, l]
           L_inv[j, i] <- -eta[[paste0("phi_", i, "_", j)]] /
                  sqrt(exp(eta[[paste0("log(innov_", j, ")")]]))
         }
@@ -47,7 +47,19 @@ dist_mvn_modchol <- function(k, ...) {
         term_3[ni] <- -1 / 2 * norm(L_inv %*% y_tild, type = "2") ^ 2
       }
       ll <- term_1 + term_2 + term_3
-      return(ll)
+      if (log == TRUE) {
+	if (sum == FALSE) {
+          return(ll)
+        } else {
+	  return(sum(ll))
+	}
+      } else {
+        if (sum == FALSE) {
+	  return(exp(ll))
+        } else {
+	  stop("Why are you summing the (non-log) likelihoods?")
+	}
+      }
     }
 
     ## TODO: scores
@@ -64,8 +76,8 @@ dist_mvn_modchol <- function(k, ...) {
         Phi_mat <- matrix(0, nrow = k, ncol = k)
 	diag(Phi_mat) <- -1  
         for (l in 1:k_phi) {    
-          i <- combns[1, l]
-          j <- combns[2, l]
+          i <- combns_cut[1, l]
+          j <- combns_cut[2, l]
           L_inv[j, i] <- -eta[[paste0("phi_", i, "_", j)]] /
                    sqrt(exp(eta[[paste0("log(innov_", j, ")")]]))
           Phi_mat[j, i] <- eta[[paste0("phi_", i, "_", j)]] 
@@ -89,14 +101,18 @@ dist_mvn_modchol <- function(k, ...) {
 
         # phi scores in columns 2k, ..., k_all
         for (l in 1:k_phi) {
-	  i <- combns[1, l]
-          j <- combns[2, l]
+	  i <- combns_cut[1, l]
+          j <- combns_cut[2, l]
 	  scores_mat[ni, 2*k + l] <- - y_til[ni, i] / 
 		         exp(eta[[paste0("log(innov_", j, ")")]]) *
                          sum(y_til[ni, 1:j] * Phi_mat[j, 1:j])
         }
       }
-      return(scores_mat)
+      if (sum == FALSE) {
+        return(scores_mat)
+      } else {
+        return(colSums(scores_mat))
+      }
     }
 
     ## links TODO: must be conditioned on k
@@ -131,9 +147,10 @@ dist_mvn_modchol <- function(k, ...) {
     ##       (code comes from univariate gaussian dittree family)
     ## Output:
     ## vector with ML estimates of distributional parameters
-    startfun <- function(y, r = k - 1, weights = NULL) {
+    startfun <- function(y, weights = NULL) {
 	# r is number of off-diagonals to model (AD-r covariance)
-        if(is.null(weights) || (length(weights) == 0L)) {
+        n <- nrow(y)
+	if(is.null(weights) || (length(weights) == 0L)) {
           starteta <- rep(-999, k_all)
           names(starteta) <- nms_eta 
           starteta[nms_mu] <- colMeans(y) # Estimates for mus
@@ -143,13 +160,13 @@ dist_mvn_modchol <- function(k, ...) {
 	  for (i in 2:k) {
 	    X <- y_til[, max(1, r-k):(i-1)] 
             beta_vec <- solve(t(X) %*% X) %*% t(X) %*% y_til[, i]            
-	    starteta[paste0("phi_", 1:(i-1) ,"_", i)] <- beta_vec
+	    starteta[paste0("phi_", max(1, r-k):(i-1) ,"_", i)] <- beta_vec
 	
 	    starteta[[paste0("log(innov_", i, ")")]] <-
 	      log(var(y_til[, i] - as.vector(X %*% beta_vec)))
 	  } 
         } else {
-          print("Nothing is happening here")
+          stop("Weights not implemented for startfun")
 	}
         return(starteta)
     }
