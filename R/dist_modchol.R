@@ -139,7 +139,7 @@ dist_mvn_modchol <- function(k, r = k - 1L, ...) {
             starteta[nms_mu] <- colMeans(y) # Estimates for mus
           
             y_til <- y - matrix(rep(starteta[nms_mu], n), ncol = k, byrow = TRUE) 
-            starteta[["log(innov_1)"]] <- stats::var(y_til[, 1])
+            starteta[["log(innov_1)"]] <- log(stats::var(y_til[, 1]))
             for (i in 2:k) {
                 X <- y_til[, max(1, r-k):(i-1)] 
                 beta_vec <- solve(t(X) %*% X) %*% t(X) %*% y_til[, i]            
