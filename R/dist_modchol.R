@@ -52,7 +52,7 @@ dist_mvn_modchol <- function(k, r = k - 1L, ...) {
     }
 
     ## scores
-    sdist <- function(y, eta, weights = NULL, sum = FALSE) {
+    sdist_ref <- function(y, eta, weights = NULL, sum = FALSE) {
         n <- nrow(y)
         scores_mat <- matrix(ncol = k_all, nrow = n)  
         colnames(scores_mat) <- nms_eta
@@ -100,6 +100,44 @@ dist_mvn_modchol <- function(k, r = k - 1L, ...) {
         } else {
             return(colSums(scores_mat))
         }
+    }
+    
+    sdist_C <- function(y, eta, weights = NULL, sum = FALSE) {
+      y <- as.matrix(y)
+      storage.mode(y) <- "numeric"
+      n <- nrow(y)
+      k <- ncol(y)
+      
+      scores_mat <- matrix(ncol = k_all, nrow = n)  
+      # First the mu_scores
+      for (j in 1:k) {
+        scores_mat[, nms_mu[j]] <- .Call("mu_score_mvnmodcholC",
+					       y, eta, n, k, j,
+					       PACKAGE = "mvnchol")
+      }
+      for (j in 1:k) {
+        scores_mat[, paste0("innov", j)] <- .Call("innov_score_mvnmodcholC",
+					       y, eta, n, k, j,
+					       PACKAGE = "mvnchol")
+      }
+      ## There is a problem with using the old C code for the phi-scores 
+      # because it relied on a par (eta) input with all distributional parameters 
+      # (i.e., not excluding high-lag phis like is done here)
+
+      # To speed up calculation, perhaps we should also avoid calling a C function 
+      # for every row of the dataset and every distributional parameter independently.
+      # More sensible would be calculating all scores in one function call for each 
+      # row of the dataset. This avoids repetitive matrix calculations.   
+
+      if (isFALSE(sum)) { 
+        return(scores_mat)
+      } else {
+        return(colSums(scores_mat))
+      }	      
+    }
+
+    sdist <- sdist_ref
+
     }
 
     ## links
