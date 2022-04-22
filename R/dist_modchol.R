@@ -138,7 +138,6 @@ dist_mvn_modchol <- function(k, r = k - 1L, ...) {
 
     sdist <- sdist_ref
 
-    }
 
     ## links
     link <- c(
@@ -211,7 +210,6 @@ dist_mvn_modchol <- function(k, r = k - 1L, ...) {
     class(dist_list) <- "disttree.family"
     return(dist_list)
 }
-
 
 
 
