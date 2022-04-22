@@ -116,7 +116,7 @@ dist_mvn_modchol <- function(k, r = k - 1L, ...) {
 					       PACKAGE = "mvnchol")
       }
       for (j in 1:k) {
-        scores_mat[, paste0("innov", j)] <- .Call("innov_score_mvnmodcholC",
+        scores_mat[, paste0("log(innov_", j, ")")] <- .Call("innov_score_mvnmodcholC",
 					       y, eta, n, k, j,
 					       PACKAGE = "mvnchol")
       }
