@@ -1,35 +1,23 @@
 [**BAMLSS**](http://www.bamlss.org/) families for [multivariate Gaussion
-regression](https://arxiv.org/abs/2102.13518) models. The multivariate
-Gaussian distribution is reparameterized using the (modified) Cholesky
-decomposition of the covariance matrix.
+regression](https://doi.org/10.1016/j.ecosta.2022.03.001) models. The
+multivariate Gaussian distribution is reparameterized using the
+(modified) Cholesky decomposition of the covariance matrix.
 
 Installation
 ------------
 
-This package is hosted on the gitlab server of the Universitaet
-Innsbruck. The repository has public access.
+You can either install it directly on your system by using
+[**remotes**](https://remotes.r-lib.org/) or
+[**devtools**](https://devtools.r-lib.org/) in an R session:
 
--   You can either install it directly on your system by using
-    [**remotes**](https://remotes.r-lib.org/) or
-    [**devtools**](https://devtools.r-lib.org/) in an R session:
+    remotes::install_github("meteosimon/mvnchol")
 
-<!-- -->
+Or clone it using [git](https://git-scm.com/) and a git client for your
+system. And build and INSTALL it after cloning, e.g. in a bash:
 
-    remotes::install_git("https://git.uibk.ac.at/c4031039/mvnchol")
-
--   Or clone it using [git](https://git-scm.com/) and a git client for
-    your system. And build and INSTALL it after cloning, e.g. in a bash:
-
-<!-- -->
-
-    git clone https://git.uibk.ac.at/c4031039/mvnchol.git
+    git clone git@github.com:meteosimon/mvnchol.git
     R CMD build mvnchol
     R CMD INSTALL mvnchol_0.3.0.tar.gz
-
--   Or download the source code as tarball
-    [mvnchol-master.tar.gz](https://git.uibk.ac.at/c4031039/mvnchol/-/archive/master/mvnchol-master.tar.gz).
-    Here, you also have to build and INSTALL the package after the
-    download.
 
 First Model
 -----------
@@ -71,30 +59,30 @@ First Model
     ## AICc 9421.452 logPost -4839.83 logLik -4648.47 edf 60.341 eps 0.0002 iteration  10
     ## AICc 9421.450 logPost -4839.83 logLik -4648.47 edf 60.342 eps 0.0000 iteration  11
     ## AICc 9421.450 logPost -4839.83 logLik -4648.47 edf 60.342 eps 0.0000 iteration  11
-    ## elapsed time:  3.65sec
+    ## elapsed time:  3.75sec
     ## Starting the sampler...
     ## 
-    ## |                    |   0%  1.05min
-    ## |*                   |   5%  1.05min  3.31sec
-    ## |**                  |  10% 57.50sec  6.39sec
-    ## |***                 |  15% 54.04sec  9.54sec
-    ## |****                |  20% 52.95sec 13.24sec
-    ## |*****               |  25% 51.24sec 17.08sec
-    ## |******              |  30% 48.83sec 20.93sec
-    ## |*******             |  35% 46.00sec 24.77sec
-    ## |********            |  40% 42.76sec 28.51sec
-    ## |*********           |  45% 39.50sec 32.31sec
-    ## |**********          |  50% 36.19sec 36.19sec
-    ## |***********         |  55% 32.73sec 40.00sec
-    ## |************        |  60% 29.29sec 43.93sec
-    ## |*************       |  65% 25.71sec 47.74sec
-    ## |**************      |  70% 22.16sec 51.71sec
-    ## |***************     |  75% 18.60sec 55.80sec
-    ## |****************    |  80% 14.99sec 59.96sec
-    ## |*****************   |  85% 11.29sec  1.07min
-    ## |******************  |  90%  7.53sec  1.13min
-    ## |******************* |  95%  3.77sec  1.19min
-    ## |********************| 100%  0.00sec  1.26min
+    ## |                    |   0%  1.14min
+    ## |*                   |   5%  1.04min  3.27sec
+    ## |**                  |  10% 58.11sec  6.46sec
+    ## |***                 |  15% 54.07sec  9.54sec
+    ## |****                |  20% 52.46sec 13.11sec
+    ## |*****               |  25% 50.73sec 16.91sec
+    ## |******              |  30% 48.31sec 20.70sec
+    ## |*******             |  35% 45.56sec 24.53sec
+    ## |********            |  40% 42.54sec 28.36sec
+    ## |*********           |  45% 39.33sec 32.18sec
+    ## |**********          |  50% 36.00sec 36.00sec
+    ## |***********         |  55% 32.49sec 39.71sec
+    ## |************        |  60% 28.98sec 43.48sec
+    ## |*************       |  65% 25.43sec 47.23sec
+    ## |**************      |  70% 21.93sec 51.17sec
+    ## |***************     |  75% 18.46sec 55.38sec
+    ## |****************    |  80% 14.88sec 59.52sec
+    ## |*****************   |  85% 11.19sec  1.06min
+    ## |******************  |  90%  7.48sec  1.12min
+    ## |******************* |  95%  3.74sec  1.19min
+    ## |********************| 100%  0.00sec  1.25min
 
     plot(b, model = "lambda12")
 

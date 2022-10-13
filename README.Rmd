@@ -4,36 +4,29 @@ output: "md_document"
 ---
 
 [**BAMLSS**](http://www.bamlss.org/) families for
-[multivariate Gaussion regression](https://arxiv.org/abs/2102.13518)
+[multivariate Gaussion regression](https://doi.org/10.1016/j.ecosta.2022.03.001)
 models. The multivariate Gaussian distribution is
 reparameterized using the (modified) Cholesky
 decomposition of the covariance matrix.
 
 ## Installation
 
-This package is hosted on the gitlab server of the Universitaet
-Innsbruck. The repository has public access.
-
-* You can either install it directly on your system by
-    using [**remotes**](https://remotes.r-lib.org/) or
-	[**devtools**](https://devtools.r-lib.org/) in an R session:
+You can either install it directly on your system by
+using [**remotes**](https://remotes.r-lib.org/) or
+[**devtools**](https://devtools.r-lib.org/) in an R session:
 
 ```r
-remotes::install_git("https://git.uibk.ac.at/c4031039/mvnchol")
+remotes::install_github("meteosimon/mvnchol")
 ```
 
-* Or clone it using [git](https://git-scm.com/) and a git client for your system.
-    And build and INSTALL it after cloning, e.g. in a bash:
+Or clone it using [git](https://git-scm.com/) and a git client for your system.
+And build and INSTALL it after cloning, e.g. in a bash:
 
 ```bash
-git clone https://git.uibk.ac.at/c4031039/mvnchol.git
+git clone git@github.com:meteosimon/mvnchol.git
 R CMD build mvnchol
 R CMD INSTALL mvnchol_`r unname(read.dcf("DESCRIPTION")[1, "Version"])`.tar.gz
 ```
-
-* Or download the source code as tarball
-[mvnchol-master.tar.gz](https://git.uibk.ac.at/c4031039/mvnchol/-/archive/master/mvnchol-master.tar.gz).
-Here, you also have to build and INSTALL the package after the download.
 
 ## First Model
 
